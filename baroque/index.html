@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f2eee7">
+<title>Medusa, Baroque Europe — CKDesign</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏺</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=3">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<main id="page">
+
+  <section id="hero">
+    <div id="pieceSlot" aria-hidden="true"></div>
+    <div id="copy">
+      <p class="kicker mono">[ Gorgon Collection &mdash; CK_007 ]</p>
+      <h1 class="title">Medusa,<br>Baroque Europe</h1>
+      <p class="era">17th century</p>
+      <p class="para">A Medusa in full Baroque drama &mdash; all writhing serpents
+      and anguished beauty, the way 17th-century European artists reimagined the
+      Gorgon. Hand-painted and sealed, she&rsquo;s theatrical, gothic, and
+      impossible to look away from.</p>
+      <div class="buy">
+        <span class="price">$45.00</span>
+        <a id="cart" class="cta mono" href="#" data-cart="">[ add to cart ]</a>
+      </div>
+      <p class="micro mono">hand-painted &amp; sealed &middot; ships from our studio</p>
+    </div>
+  </section>
+
+  <section id="gallery">
+    <p class="g-kicker mono">[ photographs ]</p>
+    <div id="rail" tabindex="0" aria-label="photographs of the piece"></div>
+    <div class="g-nav mono">
+      <button id="gPrev" aria-label="previous photo">&lsaquo;</button>
+      <span id="gCount">01 / 01</span>
+      <button id="gNext" aria-label="next photo">&rsaquo;</button>
+    </div>
+  </section>
+
+</main>
+
+<a id="back" class="mono" href="https://clayandkelsy.com/design/" target="_top">[ &larr; gorgon collection ]</a>
+<div id="brand">
+  <img src="../assets/ckd-logo.png" alt="CKD">
+  <span>clay &amp; kelsy designs</span>
+</div>
+
+<script type="module" src="app.js?v=4"></script>
+</body>
+</html>

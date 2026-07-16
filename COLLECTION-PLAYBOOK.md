@@ -133,6 +133,34 @@ When browser numbers look impossible, inspect the GLB file directly.
   monster by turns, reimagined by every age that inherited her. Impossible to
   look away from."
 
+## Product pages (one per piece — `baroque/` is the reference instance)
+
+Each piece gets a subfolder page (`<repo>/<piece>/` on Pages), embedded on its
+WP product page via its own `wordpress-embed.html`. Clone `baroque/` and swap:
+
+- `PIECE` in `app.js` (GLB path + `assetV`, `cartUrl` — null until the
+  WooCommerce product exists, then the `?add-to-cart=` link), the copy in
+  `index.html` (kicker `[ Gorgon Collection — CK_0NN ]` piece number, title,
+  era line, paragraph, price), and the photos.
+- **Photos**: drop originals in the piece's working folder, run
+  `tools/photos.sh "<folder>/pictures" ../<piece>` — emits ≤1600px JPEGs +
+  `photos.js` manifest (src + dims). Re-run to add/update; order = filename.
+- Layout: big piece LEFT (anchored to the measured `#pieceSlot` rect, ~92%
+  fill), editorial column RIGHT (kicker/title/era/para/price/CTA/micro-line);
+  portrait stacks piece-then-copy, carousel below, brand goes logo-only.
+- Piece finish: product pages run `washGamma 0.62` (LIGHTER than the
+  collection's 1.4 — at 4× magnification the baked wash reads pewter; gamma <1
+  lifts it to match the real bone-gray cast in the photos alongside).
+- Interactions: drag-inspect ±18° (`P.rot.max 0.32`), soft warm glow while
+  held, gentle bob/tumble, parallax. No placard. CTA pulses until `cartUrl`
+  is set. Back link bottom-left → the collection page (`target="_top"`).
+- **The backdrop canvas is `position:absolute` spanning the whole page —
+  NEVER `position:fixed`**: fixed elements misbehave inside iOS iframes
+  (every page here ships in a WP iframe) and skip rasterization in hidden
+  tabs. World y maps page pixels; the piece scrolls with its slot.
+- Photos strip: scroll-snap rail, frosted ‹ › buttons + `NN / NN` counter,
+  first image eager + high priority, rest lazy.
+
 ## Ideas noted for future collections (not yet built)
 
 - Scroll choreography hooks (`stageScrollCenter()` is reserved) — parallax the
