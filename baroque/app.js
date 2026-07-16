@@ -43,7 +43,7 @@ let renderer;
 try {
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
 } catch (e) { console.error(e); throw e; }
-renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));   // page-tall canvas: 1.5 keeps it crisp AND snappy
 renderer.toneMapping = THREE.NeutralToneMapping;
 renderer.toneMappingExposure = P.light.exposure;
 
@@ -251,6 +251,7 @@ function layout() {
 }
 
 function placePiece() {
+  // slot position in PAGE coords is scroll-independent — computed only on layout
   const r = slotEl.getBoundingClientRect();
   if (r.width > 0 && r.height > 0) {
     slotCache = { cx: (r.left + r.width / 2) / pageW,
@@ -258,13 +259,20 @@ function placePiece() {
                   size: Math.min(r.width, r.height) };
   }
   const pxToWorld = 2 * halfH / pageH;
-  piece.slot.position.set(
-    (slotCache.cx - 0.5) * pageW * pxToWorld,
-    (0.5 - slotCache.cy) * pageH * pxToWorld,
-    0);
+  piece.baseX = (slotCache.cx - 0.5) * pageW * pxToWorld;
+  piece.baseY = (0.5 - slotCache.cy) * pageH * pxToWorld;
+  piece.slot.position.set(piece.baseX, piece.baseY, 0);
   piece.sCur = slotCache.size * P.fill * pxToWorld;
   piece.spin.scale.setScalar(piece.sCur);
 }
+
+/* render only while the piece is on screen — scrolling the gallery costs nothing */
+let heroVisible = true;
+new IntersectionObserver((entries) => {
+  const was = heroVisible;
+  heroVisible = entries[0].isIntersecting;
+  if (heroVisible && !was) { last = perfNow(); renderOnce(perfNow() * 0.001); }
+}, { rootMargin: '15% 0px' }).observe(document.getElementById('hero'));
 
 addEventListener('resize', layout);
 new ResizeObserver(() => { layout(); renderOnce(perfNow() * 0.001); }).observe(document.body);
@@ -352,10 +360,9 @@ function step(t, dt) {
                       Math.cos(yr) * P.camDist);
   camera.lookAt(0, 0, 0);
 
-  placePiece();                                    // follows #pieceSlot through scroll
-
   const live = REDUCE ? 0 : 1;
-  piece.slot.position.y += Math.sin(t * P.bob.speed) * P.bob.amp * live;
+  piece.slot.position.set(piece.baseX || 0,
+    (piece.baseY || 0) + Math.sin(t * P.bob.speed) * P.bob.amp * live, 0);
 
   const kr = 1 - Math.exp(-P.rot.lambda * dt);
   piece.rotX += ((rotting ? rotT.x : 0) - piece.rotX) * kr;
@@ -382,7 +389,7 @@ function renderOnce(t) { step(t, 1 / 60); composer.render(); }
 let frozen = false;
 function tick() {
   requestAnimationFrame(tick);
-  if (frozen) return;
+  if (frozen || !heroVisible) return;    // piece offscreen → zero GPU work
   const now = perfNow();
   const dt = Math.min((now - last) / 1000, 0.05);
   last = now;

@@ -158,6 +158,16 @@ WP product page via its own `wordpress-embed.html`. Clone `baroque/` and swap:
   NEVER `position:fixed`**: fixed elements misbehave inside iOS iframes
   (every page here ships in a WP iframe) and skip rasterization in hidden
   tabs. World y maps page pixels; the piece scrolls with its slot.
+- **Inside a self-growing iframe, viewport-height units are poison.** The
+  iframe grows to fit content → svh/vh/aspect-ratio queries see the GROWN
+  height → taller layout → grows again, until the desktop page wears the
+  phone layout. Every block height must be **width-based or px-capped**
+  (`min(100svh, 58vw)` hero, `min(44vw, 560px)` rail, etc.) and breakpoints
+  go by `max-width`, never aspect-ratio. This bit the baroque page live.
+- **Perf recipe for product pages**: DPR capped at 1.5 (page-tall canvas),
+  render loop fully paused while the hero is offscreen (IntersectionObserver),
+  piece position cached at layout (page coords are scroll-independent — no
+  per-frame rect reads). ~0.2ms/frame; scrolling the gallery costs zero GPU.
 - Photos strip: scroll-snap rail, frosted ‹ › buttons + `NN / NN` counter,
   first image eager + high priority, rest lazy.
 
