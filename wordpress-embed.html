@@ -1,0 +1,26 @@
+<!-- CKDesign — Gorgon Collection · WordPress Custom HTML block.
+     Paste this WHOLE file into one Custom HTML block. The iframe grows to fit
+     the collection column on phones (the page posts its height up). -->
+<style>
+  #ckd-gorgon{ width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); }
+  #ckd-gorgon iframe{ display:block; width:100%; height:100svh; height:100dvh; border:0; }
+</style>
+<div id="ckd-gorgon">
+  <iframe id="ckd-gorgon-frame"
+          src="https://clayburton.github.io/gorgon-collection/"
+          title="Gorgon Collection — CKDesign"
+          loading="lazy"
+          allow="fullscreen"></iframe>
+</div>
+<script>
+  (function () {
+    var frame = document.getElementById('ckd-gorgon-frame');
+    addEventListener('message', function (e) {
+      if (e.origin !== 'https://clayburton.github.io') return;
+      var d = e.data || {};
+      if (d.ckd === 'height' && typeof d.h === 'number' && d.h > 200 && d.h < 12000) {
+        frame.style.height = Math.round(d.h) + 'px';
+      }
+    });
+  })();
+</script>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f2eee7">
+<title>CKDesign — Gorgon Collection</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏺</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <div id="labelLayer" aria-hidden="true"></div>
+
+  <header id="masthead">
+    <h1 class="title">Gorgon Collection</h1>
+    <p class="tagline">The face the ancient world carved to ward off harm &mdash; guardian and
+    monster by turns, reimagined by every age that inherited her. Impossible to look away from.</p>
+    <p class="note">3D printed &amp; painted by hand.</p>
+  </header>
+
+  <p id="hint" class="mono">[ click to find out more ]</p>
+
+  <div id="brand">
+    <img src="assets/ckd-logo.png" alt="CKD">
+    <span>clay &amp; kelsy designs</span>
+  </div>
+
+  <div id="fallback" hidden>
+    <h1 class="title">Gorgon Collection</h1>
+    <ul id="fallbackList"></ul>
+  </div>
+
+  <div id="flash" aria-hidden="true"></div>
+</div>
+
+<script type="module" src="app.js?v=29"></script>
+</body>
+</html>
