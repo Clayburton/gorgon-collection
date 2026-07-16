@@ -257,6 +257,10 @@ Promise.all(COLLECTION.products.map(p => new Promise((res, rej) =>
     gltf.scene.traverse(o => { if (o.isMesh && !src) src = o; });
     const geo = src.geometry.clone().applyMatrix4(src.matrixWorld);
     geo.computeBoundingSphere();
+    geo.computeBoundingBox();
+    // on-screen height = object-space Z extent (the face rotation maps z → vertical);
+    // wide plaques (wings) are much shorter than their max-dim — placards anchor to this
+    const halfHgt = Math.max(0.15, (geo.boundingBox.max.z - geo.boundingBox.min.z) / 2);
 
     const mat = makeStoneWash(COLLECTION.finish);
     const mesh = new THREE.Mesh(geo, mat);
@@ -289,7 +293,7 @@ Promise.all(COLLECTION.products.map(p => new Promise((res, rej) =>
     labelLayer.appendChild(label);
 
     relics.push({
-      slot, spin, mesh, mat, prod, label,
+      slot, spin, mesh, mat, prod, label, halfHgt,
       home: new THREE.Vector3(), pos: new THREE.Vector3(),
       baseTilt: { x: spin.rotation.x, y: spin.rotation.y },
       sBase: 1, sCur: 1, hover: 0, dim: 0,
@@ -362,8 +366,8 @@ function layout() {
   });
 
   document.getElementById('hint').innerHTML = coarse
-    ? '[ tap a piece to find out more ]'
-    : '[ click to find out more ]';
+    ? '[ tap each object to find out more ]'
+    : '[ click each object to find out more ]';
 }
 addEventListener('resize', layout);
 new ResizeObserver(() => { layout(); renderOnce(perfNow() * 0.001); }).observe(stage);
@@ -518,7 +522,7 @@ function step(t, dt) {
     // placard under the piece
     const show = r.label.classList.contains('on') || r.hover > 0.12;
     if (show) {
-      V2.copy(r.slot.position); V2.y -= r.sCur * 0.60;
+      V2.copy(r.slot.position); V2.y -= r.sCur * (r.halfHgt + 0.04);
       V2.project(camera);
       const w = stage.clientWidth || innerWidth, h = stage.clientHeight || innerHeight;
       r.label.style.transform =
