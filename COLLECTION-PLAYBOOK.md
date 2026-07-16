@@ -22,6 +22,13 @@ look, behave, and get built. Read it top to bottom before building the next one.
   Interaction = hover (desktop) / tap (touch) and click-through.
 - **Hover = premium presentation**: the piece grows *slightly* (≈1.045) and
   rotates *slightly* (a few degrees toward the viewer). Never drastic.
+  Pieces whose face reads small (wide plaques like Winged Egypt) get a
+  per-product `hoverScale` so every piece meets the same presented size.
+- **Click-drag = inspect**: dragging on a piece tilts it up to ~15° in any
+  direction and it eases back on release. A drag never navigates.
+- **Placard hold**: gliding from the piece down onto its placard keeps the
+  piece presented and the placard clickable (`labelHold` + focus chain
+  drag → hover → placard → selected).
 - **Focus dim**: while one piece is presented, the others recede (opacity
   ≈0.45, scale ≈0.97). (Wireframe ghosting was considered and rejected — a
   70k-tri scan renders as a hairball wireframe.)
@@ -30,11 +37,20 @@ look, behave, and get built. Read it top to bottom before building the next one.
   copy — the chip says "link".
 - **Bottom-left**: `[ click to find out more ]` (touch: tap wording).
   **Bottom-right**: CKD logo with "clay & kelsy designs" beneath — minimal.
-- **Type**: Cormorant Garamond (names, masthead, italic tagline) + Courier
-  Prime (mono UI). Matches packaging/logo line-art vibe.
+- **Type**: Cormorant Garamond (names, masthead) + **EB Garamond** (tagline —
+  Cormorant is too thin for paragraph sizes) + Courier Prime (mono UI).
+  Keep the smallest mono ≥10px.
 - **Mobile is a first-class experience**: single centered column, pieces
-  ~60% width, placard visible under EVERY piece (no hover needed), nothing
-  overlapping. The stage grows taller than the viewport and the page scrolls.
+  ~66% width, placard visible under EVERY piece (no hover needed), nothing
+  overlapping, hint line hidden (redundant there). **The column is measured
+  in PIXELS in `layout()`**: masthead DOM height + N × (pieceH + placardH +
+  gap) + clearance → stage height. Never derive it from `innerHeight` (an
+  auto-resizing parent iframe feedback-loops) and never from viewport
+  fractions (that's what caused v0.2's dead top band + cut-off last piece).
+  The page posts its height to the WP embed, which grows the iframe.
+- **Resizing across the portrait/landscape boundary must be clean both ways**
+  — `layout()` clears `stage.style.height`, placard `.on` classes and inline
+  opacity resolve in `step()`; `pointerleave` clears the hovered piece.
 - **Finish**: pieces are PLA prints with an acrylic wash + coating. The look is
   light warm gray with the wash pooling dark in crevices and dry-brushed
   highlights on raised detail (see `Gorgan Souther Italy ref Pic.jpg`).
