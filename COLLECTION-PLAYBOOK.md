@@ -34,7 +34,11 @@ look, behave, and get built. Read it top to bottom before building the next one.
   70k-tri scan renders as a hairball wireframe.)
 - **Placard** (frosted glass, backdrop-blur, hairline border): serif name,
   mono small-caps date/sub, and an arrow-in-square link chip. No "view piece"
-  copy — the chip says "link".
+  copy — the chip says "link". Anchored to the piece's **measured on-screen
+  height** (geometry bbox z-extent), ~24px gap — anchoring to max-dim makes
+  wide plaques' placards float far below (the Winged Medusa bug).
+- **Bottom-left copy**: `[ click each object to find out more ]`
+  (`tap` on touch; hidden on portrait).
 - **Bottom-left**: `[ click to find out more ]` (touch: tap wording).
   **Bottom-right**: CKD logo with "clay & kelsy designs" beneath — minimal.
 - **Type**: Cormorant Garamond (names, masthead) + **EB Garamond** (tagline —
