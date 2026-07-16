@@ -19,7 +19,8 @@ const COLLECTION = {
     { id:'baroque',  name:'Medusa Baroque Europe', date:'17th Century',
       url:'https://clayandkelsy.com/medusa-baroque-europe/', file:'assets/baroque.glb' },
     { id:'winged',   name:'Winged Medusa Egypt',   date:'332–250 BCE',
-      url:'https://clayandkelsy.com/medusa-wing-egypt/', file:'assets/winged.glb' },
+      url:'https://clayandkelsy.com/medusa-wing-egypt/', file:'assets/winged.glb',
+      hoverScale: 1.17 },   // wide plaque, small face — meets the others at full hover
     { id:'southern', name:'Medusa Southern Italy', date:'500 BCE',
       url:'https://clayandkelsy.com/medusa-southern-italy/', file:'assets/southern.glb' },
   ],
@@ -59,6 +60,7 @@ const P = {
   bob:      { amp: 0.05, speed: 0.42 },
   tumble:   { amp: 0.05, speed: 0.3 },
   hover:    { scale: 1.045, tiltX: -0.055, tiltY: 0.085, lambda: 7 },
+  rot:      { max: 0.26, perPx: 1 / 220, lambda: 9 },    // click-drag inspect (~15°)
   dim:      { opacity: 0.45, scale: 0.97, lambda: 6 },   // non-focused pieces recede
   light:    { key: 1.35, fill: 0.5, rim: 0.85, env: 0.5, exposure: 1.0 },
   grade:    { grain: 0.026, vignette: 0.26, contrast: 1.028, centerLight: 0.05 },
@@ -281,6 +283,9 @@ Promise.all(COLLECTION.products.map(p => new Promise((res, rej) =>
       `<path d="M1.5 8.5 8.5 1.5 M3 1.5 H8.5 V7"/></svg></span></div>` +
       `<span class="dt">${prod.date}</span>`;
     label.addEventListener('click', () => navigate(i));
+    // gliding from the piece down onto its placard keeps it presented + clickable
+    label.addEventListener('pointerenter', () => { labelHold = i; });
+    label.addEventListener('pointerleave', () => { if (labelHold === i) labelHold = -1; });
     labelLayer.appendChild(label);
 
     relics.push({
@@ -305,10 +310,16 @@ function layout() {
   const w = stage.clientWidth || innerWidth || 1200;
   portrait = w > 0 && (w / Math.max(innerHeight, 1)) < 0.9;
 
-  // portrait: the stage grows into a scrollable column.
-  // width-driven so an auto-resizing parent iframe can't feedback-loop
+  /* portrait: pixel-measured column — masthead height + N × (piece + placard).
+     Width/content-driven only (never innerHeight), so the stage is exactly as
+     tall as the collection needs: no dead band up top, no cut-off last piece,
+     and an auto-resizing parent iframe can't feedback-loop. */
+  const col = { pieceH: Math.round(w * 0.66), placardH: 106, gap: 34, topPad: 0 };
   if (portrait) {
-    const want = Math.round(Math.max(innerHeight, w * 0.95 + relics.length * (w * 0.60 + 130)));
+    const mast = document.getElementById('masthead');
+    const mastBottom = (mast.offsetTop + mast.offsetHeight) || Math.round(w * 0.95);
+    col.topPad = mastBottom + 48;
+    const want = col.topPad + relics.length * (col.pieceH + col.placardH + col.gap) + 72;
     if (Math.abs(stage.clientHeight - want) > 6) stage.style.height = want + 'px';
   } else if (stage.style.height) {
     stage.style.height = '';
@@ -328,14 +339,12 @@ function layout() {
 
   const coarse = matchMedia('(pointer:coarse)').matches;
   const camHome = new THREE.Vector3(0, 0, P.camDist);
+  const pxToWorld = 2 * halfH / h;
   relics.forEach((r, i) => {
     if (portrait) {
-      // centered column below the masthead, breathing room between pieces
-      const topFrac = 0.30, botFrac = 0.06;
-      const span = 2 * halfH * (1 - topFrac - botFrac);
-      const y = halfH * (1 - 2 * topFrac) - (relics.length < 2 ? span / 2 : span * (i / (relics.length - 1)));
-      r.home.set((i % 2 ? 0.05 : -0.05) * halfW, y, 0);
-      r.sBase = P.objScaleP * halfW;
+      const cyPx = col.topPad + i * (col.pieceH + col.placardH + col.gap) + col.pieceH / 2;
+      r.home.set((i % 2 ? 0.045 : -0.045) * halfW, halfH - cyPx * pxToWorld, 0);
+      r.sBase = col.pieceH * pxToWorld;              // geometry max-dim 1 ⇒ ≈pieceH px
     } else {
       const sl = COLLECTION.scatterL[i % COLLECTION.scatterL.length];
       const yTop = halfH * (1 - P.topClear * 2);      // menu-bar headroom
@@ -345,7 +354,8 @@ function layout() {
     r.pos.copy(r.home);
     r.slot.position.copy(r.home);
     r.slot.lookAt(camHome);                            // curator's angle
-    r.sCur = r.sBase * (1 + (P.hover.scale - 1) * r.hover);
+    const hs = r.prod.hoverScale || P.hover.scale;
+    r.sCur = r.sBase * (1 + (hs - 1) * r.hover);
     r.spin.scale.setScalar(r.sCur);
     r.labelBelow = true;
     if (portrait || coarse) r.label.classList.add('on');   // names always visible on mobile
@@ -363,7 +373,10 @@ const ray = new THREE.Raycaster();
 const ndc = new THREE.Vector2(0, -2);
 let hotIdx = -1;
 let selected = -1;
+let labelHold = -1;                             // pointer resting on a placard
 let downX = 0, downY = 0, downIdx = -1, pointerOn = false;
+let rotting = false;                            // click-drag inspect in progress
+const rotT = { x: 0, y: 0 };                    // target inspect tilt (rad)
 
 function ptrToNdc(e) {
   const rect = canvas.getBoundingClientRect();
@@ -386,20 +399,43 @@ function pickHover() {
   }
 }
 
-canvas.addEventListener('pointermove', (e) => { ptrToNdc(e); pointerOn = true; });
-canvas.addEventListener('pointerleave', () => { pointerOn = false; ndc.set(0, -2); });
+canvas.addEventListener('pointermove', (e) => {
+  ptrToNdc(e); pointerOn = true;
+  if (downIdx >= 0) {                            // click-drag = inspect the piece
+    const dx = e.clientX - downX, dy = e.clientY - downY;
+    if (rotting || Math.hypot(dx, dy) > P.clickPx) {
+      rotting = true;
+      canvas.classList.add('is-grab');
+      rotT.y = THREE.MathUtils.clamp(dx * P.rot.perPx, -1, 1) * P.rot.max;
+      rotT.x = THREE.MathUtils.clamp(dy * P.rot.perPx, -1, 1) * P.rot.max;
+    }
+  }
+});
+canvas.addEventListener('pointerleave', () => {
+  pointerOn = false; ndc.set(0, -2);
+  hotIdx = -1;                                   // nothing under a pointer that left
+  canvas.classList.remove('is-hot');
+});
 canvas.addEventListener('pointerdown', (e) => {
   ptrToNdc(e); pointerOn = true;
   pickHover();
   downX = e.clientX; downY = e.clientY; downIdx = hotIdx;
+  if (downIdx >= 0) { try { canvas.setPointerCapture(e.pointerId); } catch (_) {} }
 });
+function endInspect() {
+  rotting = false;
+  rotT.x = 0; rotT.y = 0;                        // piece eases back to rest
+  canvas.classList.remove('is-grab');
+}
 canvas.addEventListener('pointerup', (e) => {
   const still = Math.hypot(e.clientX - downX, e.clientY - downY) <= P.clickPx;
-  if (!still || downIdx < 0) { if (still && downIdx < 0) selected = -1; downIdx = -1; return; }
-  activate(downIdx);
+  const idx = downIdx;
   downIdx = -1;
+  endInspect();
+  if (still && idx >= 0) activate(idx);          // a drag never navigates
+  else if (still && idx < 0) selected = -1;
 });
-canvas.addEventListener('pointercancel', () => { downIdx = -1; });
+canvas.addEventListener('pointercancel', () => { downIdx = -1; endInspect(); });
 
 function activate(i) {
   // touch: first tap presents the piece, second tap (or the placard) opens it
@@ -436,7 +472,10 @@ function step(t, dt) {
   camera.position.set(Math.sin(yr) * P.camDist, Math.sin(pr) * P.camDist * 0.4, Math.cos(yr) * P.camDist);
   camera.lookAt(0, 0, 0);
 
-  const focus = hotIdx >= 0 ? hotIdx : selected;
+  const focus = (downIdx >= 0 && rotting) ? downIdx
+              : hotIdx >= 0 ? hotIdx
+              : labelHold >= 0 ? labelHold      // pointer parked on the placard
+              : selected;
 
   relics.forEach((r, i) => {
     const kh = 1 - Math.exp(-P.hover.lambda * dt);
@@ -455,17 +494,24 @@ function step(t, dt) {
     r.slot.position.copy(r.pos);
     r.slot.position.y += Math.sin(t * P.bob.speed + r.phase * 2.1) * P.bob.amp * live;
 
-    // pose: calm tumble + a slight presentation tilt on hover
+    // click-drag inspect: this piece follows the drag (±~15°), others stay put
+    const kr = 1 - Math.exp(-P.rot.lambda * dt);
+    const inspecting = downIdx === i && rotting;
+    r.rotX = (r.rotX || 0) + ((inspecting ? rotT.x : 0) - (r.rotX || 0)) * kr;
+    r.rotY = (r.rotY || 0) + ((inspecting ? rotT.y : 0) - (r.rotY || 0)) * kr;
+
+    // pose: calm tumble + a slight presentation tilt on hover + inspect tilt
     const ph = r.phase;
     r.spin.rotation.x = r.baseTilt.x
       + (Math.sin(t * P.tumble.speed + ph) * 0.6 + Math.sin(t * P.tumble.speed * 1.7 + ph * 3.1) * 0.4) * P.tumble.amp * live
-      + P.hover.tiltX * r.hover;
+      + P.hover.tiltX * r.hover + r.rotX;
     r.spin.rotation.y = r.baseTilt.y
       + (Math.cos(t * P.tumble.speed * 0.8 + ph * 1.6) * 0.6 + Math.sin(t * P.tumble.speed * 1.3 + ph * 2.2) * 0.4) * P.tumble.amp * live
-      + P.hover.tiltY * r.hover;
+      + P.hover.tiltY * r.hover + r.rotY;
 
-    // scale: slight grow on hover, slight recede when another piece has focus
-    const sTarget = r.sBase * (1 + (P.hover.scale - 1) * r.hover) * (1 - (1 - P.dim.scale) * r.dim);
+    // scale: slight grow on hover (per-piece override), recede when unfocused
+    const hs = r.prod.hoverScale || P.hover.scale;
+    const sTarget = r.sBase * (1 + (hs - 1) * r.hover) * (1 - (1 - P.dim.scale) * r.dim);
     r.sCur += (sTarget - r.sCur) * kh;
     r.spin.scale.setScalar(r.sCur);
 

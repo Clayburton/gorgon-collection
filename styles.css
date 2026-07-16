@@ -33,6 +33,7 @@ body{ min-height:100%; overflow-x:hidden; }
   cursor:default;
 }
 #gl.is-hot{ cursor:pointer; }
+#gl.is-grab{ cursor:grabbing; }
 
 /* ---------- type ---------- */
 
@@ -54,19 +55,18 @@ body{ min-height:100%; overflow-x:hidden; }
   letter-spacing:.01em;
 }
 #masthead .tagline{
-  margin-top:1.2em;
-  font-family:'Cormorant Garamond', Georgia, serif;
-  font-style:italic;
+  margin-top:1.15em;
+  font-family:'EB Garamond', Georgia, serif;
   font-weight:500;
-  font-size:clamp(14.5px, 1.9vmin, 19px);
-  line-height:1.62;
+  font-size:clamp(16.5px, 2.25vmin, 21.5px);
+  line-height:1.64;
   color:var(--ink);
-  opacity:.82;
-  max-width:36ch;
+  opacity:.88;
+  max-width:38ch;
 }
 #masthead .note{
-  margin-top:1.5em;
-  font-size:clamp(9.5px, 1.15vmin, 11.5px);
+  margin-top:1.4em;
+  font-size:clamp(10.5px, 1.3vmin, 12.5px);
   letter-spacing:.18em;
   text-transform:uppercase;
   color:var(--muted);
@@ -74,7 +74,7 @@ body{ min-height:100%; overflow-x:hidden; }
 
 #hint{
   position:absolute; left:clamp(22px, 4.2vw, 56px); bottom:clamp(18px, 3.4vh, 34px);
-  font-size:clamp(10px, 1.2vmin, 12px);
+  font-size:clamp(11px, 1.35vmin, 13px);
   letter-spacing:.1em;
   color:var(--muted);
   z-index:4; pointer-events:none;
@@ -92,7 +92,7 @@ body{ min-height:100%; overflow-x:hidden; }
   mix-blend-mode:multiply;      /* line-art sits on the paper, no white box */
 }
 #brand span{
-  font-size:clamp(8.5px, 1vmin, 10px);
+  font-size:clamp(9.5px, 1.15vmin, 11px);
   letter-spacing:.22em;
   text-transform:uppercase;
   color:var(--muted);
@@ -149,7 +149,7 @@ body{ min-height:100%; overflow-x:hidden; }
   display:block;
   margin-top:.45em;
   font-family:'Courier Prime', ui-monospace, monospace;
-  font-size:clamp(9px, 1.1vmin, 11px);
+  font-size:clamp(10px, 1.25vmin, 12px);
   letter-spacing:.2em;
   text-transform:uppercase;
   color:var(--muted);
@@ -197,10 +197,10 @@ body{ min-height:100%; overflow-x:hidden; }
     max-width:min(86vw, 480px);
     top:clamp(64px, 9vh, 100px);
   }
-  #masthead .tagline{ font-size:clamp(14px, 4vw, 17px); }
+  #masthead .tagline{ font-size:clamp(16px, 4.5vw, 19px); }
   .placard .nm{ font-size:clamp(16px, 4.6vw, 21px); }
-  .placard .dt{ font-size:clamp(8.5px, 2.4vw, 10.5px); }
-  #hint{ bottom:16px; }
+  .placard .dt{ font-size:clamp(9.5px, 2.7vw, 11.5px); }
+  #hint{ display:none; }        /* placards are always visible here — no hint needed */
   #brand{ bottom:14px; }
 }
 
