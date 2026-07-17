@@ -1,21 +1,15 @@
 <!-- CKDesign — Medusa, Calabria Italy (CK_003) · WordPress Custom HTML block.
      Paste this WHOLE file into one Custom HTML block on /medusa-calabria-italy/.
+     ⚠ REPLACES the current block — delete the old one, paste this, don't keep both.
 
-     Desktop: the iframe stays viewport-sized and the PAGE SCROLLS INSIDE IT —
-     trackpad momentum never crosses the iframe boundary (that handoff was the
-     scroll stutter). Phones: iOS forces iframes to fit their content, so the
-     iframe grows to the page's posted height and the WP page scrolls. -->
+     The iframe is FULL viewport height (100dvh) so it fills the screen and the
+     WordPress footer stays well below it — scrolling over the iframe scrolls the
+     page INSIDE it (smooth, no footer peek). Never use calc(100dvh - Npx): a
+     shorter iframe lets the site footer peek in under it. Phones grow the iframe
+     to the page's posted height (iOS forces iframes to fit their content). -->
 <style>
   #ckd-calabria{ width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); }
-  #ckd-calabria iframe{
-    display:block; width:100%; border:0;
-    /* viewport minus the site header bar so the whole page shows */
-    height:calc(100svh - 84px); height:calc(100dvh - 84px);
-  }
-  @media (max-width:700px){
-    /* height is driven by the page's postMessage below */
-    #ckd-calabria iframe{ height:100svh; height:100dvh; }
-  }
+  #ckd-calabria iframe{ display:block; width:100%; height:100svh; height:100dvh; border:0; }
 </style>
 <div id="ckd-calabria">
   <iframe id="ckd-calabria-frame"
@@ -30,9 +24,8 @@
     addEventListener('message', function (e) {
       if (e.origin !== 'https://clayburton.github.io') return;
       var d = e.data || {};
-      // only phones grow the iframe; desktop scrolls inside it
-      if (d.ckd === 'height' && typeof d.h === 'number' && d.h > 200 && d.h < 12000
-          && matchMedia('(max-width:700px)').matches) {
+      // the page only posts a height on phones (desktop stays silent); grow to fit
+      if (d.ckd === 'height' && typeof d.h === 'number' && d.h > 200 && d.h < 12000) {
         frame.style.height = Math.round(d.h) + 'px';
       }
     });
