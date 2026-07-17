@@ -9,7 +9,20 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=EB+Garamond:wght@400;500&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="styles.css?v=4">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<!-- THE IMPORT MAP MUST COME BEFORE ANY modulepreload. From cache
+     (back/refresh) the preloads register instantly, the map arrives "too
+     late", bare 'three' fails to resolve and the whole module dies silently —
+     that was the blank-masks-on-back bug. -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+  }
+}
+</script>
 <!-- flatten the module waterfall: fetch three + the addons alongside app.js
      instead of one hop after it -->
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js">
@@ -19,14 +32,11 @@
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/postprocessing/EffectComposer.js">
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/postprocessing/RenderPass.js">
 <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/postprocessing/ShaderPass.js">
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
-  }
-}
-</script>
+<!-- start the mask downloads with the HTML instead of after the JS chain -->
+<link rel="preload" as="fetch" crossorigin href="../assets/odysseus.glb?v=1">
+<link rel="preload" as="fetch" crossorigin href="../assets/athena.glb?v=1">
+<link rel="preload" as="fetch" crossorigin href="../assets/cyclops.glb?v=1">
+<link rel="preload" as="fetch" crossorigin href="../assets/shepherd.glb?v=1">
 </head>
 <body>
 
@@ -59,6 +69,6 @@
   <div id="flash" aria-hidden="true"></div>
 </div>
 
-<script type="module" src="app.js?v=3"></script>
+<script type="module" src="app.js?v=4"></script>
 </body>
 </html>

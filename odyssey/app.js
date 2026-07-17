@@ -49,10 +49,10 @@ const COLLECTION = {
      Polyphemus masks are the supporting pair — same size, same baseline,
      flanking bottom-left / bottom-right */
   scatterL: [
-    { x:-0.06, y:-0.10, z:-0.16, s:1.10 },   // Odysseus — the hero, center stage, featured
-    { x:-0.50, y: 0.50, z:-0.28, s:1.16 },   // Athena — the goddess, featured, watching from above
-    { x:-0.66, y:-0.56, z: 0.05, s:0.80 },   // Cyclops — bottom-left of the pair
-    { x: 0.52, y:-0.56, z: 0.05, s:0.80 },   // Shepherd — bottom-right, mirrors the Cyclops
+    { x:-0.04, y:-0.10, z:-0.16, s:1.22 },   // Odysseus — the hero, center stage, featured
+    { x:-0.52, y: 0.52, z:-0.28, s:1.30 },   // Athena — the goddess, featured, watching from above
+    { x:-0.68, y:-0.56, z: 0.05, s:0.96 },   // Cyclops — bottom-left of the pair
+    { x: 0.54, y:-0.56, z: 0.05, s:0.96 },   // Shepherd — bottom-right, mirrors the Cyclops
   ],
 };
 
