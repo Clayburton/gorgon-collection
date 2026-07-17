@@ -188,6 +188,7 @@ WP product page via its own `wordpress-embed.html`. Clone `baroque/` and swap:
   NEVER `position:fixed`**: fixed elements misbehave inside iOS iframes
   (every page here ships in a WP iframe) and skip rasterization in hidden
   tabs. World y maps page pixels; the piece scrolls with its slot.
+- **Embed iframe height MUST be full `100svh/100dvh` — NEVER `calc(100dvh - Npx)`.** A shorter-than-viewport iframe lets the WordPress site footer peek in under it (the calabria footer bug). Full height fills the screen, keeps the footer well below, and scroll-over-iframe scrolls internally. Clone the embed from a page whose LIVE embed is confirmed working — not from a file that may carry an un-pasted 'improvement'. (baroque's FILE had a -84px version that was never live; cloning the file, not the live block, is what introduced this.)
 - **Product-page embeds run TWO modes** (`baroque/wordpress-embed.html`):
   desktop iframe stays viewport-sized (`calc(100dvh - 84px)`) and the page
   scrolls INSIDE it — trackpad momentum never crosses the iframe boundary
