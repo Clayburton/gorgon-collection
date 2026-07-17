@@ -163,6 +163,10 @@ WP product page via its own `wordpress-embed.html`. Clone `baroque/` and swap:
   WooCommerce product exists, then the `?add-to-cart=` link), the copy in
   `index.html` (kicker `[ Gorgon Collection — CK_0NN ]` piece number, title,
   era line, paragraph, price), and the photos.
+- **No photos yet?** Ship with an empty `photos.js` (`const PHOTOS=[]`)
+  — app.js hides the whole `#gallery` section when it's empty, so the
+  hero flows straight into `#info`. Drop a photos folder + run the
+  pipeline later and the gallery reappears. (Calabria shipped this way.)
 - **Photos**: drop originals in the piece's working folder, run
   `tools/photos.sh "<folder>/pictures" ../<piece>` — emits ≤1600px JPEGs +
   `photos.js` manifest (src + dims). Re-run to add/update; order = filename.
