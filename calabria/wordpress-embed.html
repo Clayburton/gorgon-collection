@@ -1,0 +1,40 @@
+<!-- CKDesign — Medusa, Calabria Italy (CK_003) · WordPress Custom HTML block.
+     Paste this WHOLE file into one Custom HTML block on /medusa-calabria-italy/.
+
+     Desktop: the iframe stays viewport-sized and the PAGE SCROLLS INSIDE IT —
+     trackpad momentum never crosses the iframe boundary (that handoff was the
+     scroll stutter). Phones: iOS forces iframes to fit their content, so the
+     iframe grows to the page's posted height and the WP page scrolls. -->
+<style>
+  #ckd-calabria{ width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); }
+  #ckd-calabria iframe{
+    display:block; width:100%; border:0;
+    /* viewport minus the site header bar so the whole page shows */
+    height:calc(100svh - 84px); height:calc(100dvh - 84px);
+  }
+  @media (max-width:700px){
+    /* height is driven by the page's postMessage below */
+    #ckd-calabria iframe{ height:100svh; height:100dvh; }
+  }
+</style>
+<div id="ckd-calabria">
+  <iframe id="ckd-calabria-frame"
+          src="https://clayburton.github.io/gorgon-collection/calabria/"
+          title="Medusa, Calabria Italy — CKDesign"
+          loading="lazy"
+          allow="fullscreen"></iframe>
+</div>
+<script>
+  (function () {
+    var frame = document.getElementById('ckd-calabria-frame');
+    addEventListener('message', function (e) {
+      if (e.origin !== 'https://clayburton.github.io') return;
+      var d = e.data || {};
+      // only phones grow the iframe; desktop scrolls inside it
+      if (d.ckd === 'height' && typeof d.h === 'number' && d.h > 200 && d.h < 12000
+          && matchMedia('(max-width:700px)').matches) {
+        frame.style.height = Math.round(d.h) + 'px';
+      }
+    });
+  })();
+</script>

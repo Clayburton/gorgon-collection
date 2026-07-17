@@ -1,0 +1,309 @@
+:root{
+  --paper:#f2eee7;
+  --ink:#26202c;
+  --muted:#6f6479;
+  --pink:#cc5f97;
+  --hair:rgba(38,32,44,.16);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+html,body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Courier Prime', ui-monospace, monospace;
+}
+/* overflow-x: CLIP, not hidden — hidden makes body a scroll container and
+   breaks macOS momentum scrolling; clip only crops */
+html,body{ overflow-x:clip; }
+body{ min-height:100%; position:relative; }
+
+/* the gallery wall: paper backdrop spanning the whole page (absolute, not
+   fixed — fixed elements misbehave inside iOS iframes and skip rasterization
+   in hidden tabs; the collection page proved this architecture) */
+#gl{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  display:block;
+  z-index:0;
+  touch-action:pan-y;
+  cursor:default;
+}
+#gl.is-hot{ cursor:grab; }
+#gl.is-grab{ cursor:grabbing; }
+
+#page{ position:relative; z-index:1; pointer-events:none; }
+#page a, #page button, #page #rail{ pointer-events:auto; }
+
+.mono{ font-family:'Courier Prime', ui-monospace, monospace; }
+
+/* ============================ hero ============================ */
+
+/* Hero height and piece size are BOTH svh-based so the piece fills the hero
+   instead of floating in it (the vw caps only bind on ultrawide-short screens).
+   Kept tight — hero ≈ piece + a little air — so the photo frames peek above the
+   fold. svh is honest because the desktop embed iframe stays viewport-sized and
+   scrolls internally (see wordpress-embed.html). */
+#hero{
+  display:grid;
+  grid-template-columns: 54% 46%;
+  align-items:center;
+  min-height:min(68svh, 58vw);
+  /* generous top pad clears the site menu bar with air; bottom stays tight so
+     the photos still peek */
+  padding:clamp(64px,6.5vw,108px) clamp(22px,4.2vw,56px) clamp(16px,1.8vw,30px);
+}
+#pieceSlot{ height:min(56svh, 44vw); }
+
+#copy{ max-width:520px; justify-self:start; padding-right:clamp(0px,2vw,28px); }
+#copy .kicker{
+  font-size:clamp(10.5px,1.3vmin,12.5px);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+#copy .title{
+  margin-top:.55em;
+  font-family:'Cormorant Garamond', Georgia, serif;
+  font-weight:500;
+  font-size:clamp(40px,5.6vmin,66px);
+  line-height:1.02;
+  letter-spacing:.01em;
+}
+#copy .era{
+  margin-top:.5em;
+  font-family:'EB Garamond', Georgia, serif;
+  font-style:italic;
+  font-size:clamp(15px,2vmin,19px);
+  color:var(--muted);
+}
+#copy .para{
+  margin-top:1.4em;
+  font-family:'EB Garamond', Georgia, serif;
+  font-weight:500;
+  font-size:clamp(16.5px,2.2vmin,21px);
+  line-height:1.64;
+  opacity:.88;
+  max-width:44ch;
+}
+
+.buy{
+  margin-top:1.6em;
+  display:flex; align-items:center; gap:clamp(18px,2.4vw,30px);
+}
+.price{
+  font-family:'Cormorant Garamond', Georgia, serif;
+  font-weight:600;
+  font-size:clamp(30px,4vmin,44px);
+  letter-spacing:.01em;
+}
+/* CTA: a real button in the house voice — solid ink, mono brackets, arrow chip */
+.cta{
+  display:inline-flex;
+  align-items:center;
+  gap:.8em;
+  padding:.95em 1.55em;
+  background:var(--ink);
+  border:1px solid var(--ink);
+  border-radius:9px;
+  color:#f4f0e8;
+  text-decoration:none;
+  font-size:clamp(12px,1.5vmin,14px);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  box-shadow:0 12px 30px rgba(38,32,44,.20), 0 2px 6px rgba(38,32,44,.10);
+  transition:background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.cta:hover{
+  background:var(--pink);
+  border-color:var(--pink);
+  transform:translateY(-1px);
+  box-shadow:0 16px 38px rgba(38,32,44,.24), 0 2px 6px rgba(38,32,44,.10);
+}
+.cta.pulse{ animation:ctaPulse .5s ease; }
+@keyframes ctaPulse{
+  0%{ transform:scale(1); }
+  35%{ transform:scale(.97); }
+  100%{ transform:scale(1); }
+}
+.micro{
+  margin-top:1.3em;
+  font-size:clamp(10px,1.2vmin,11.5px);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* ========================== gallery ========================== */
+
+#gallery{
+  padding:clamp(24px,2.5vw,44px) 0 clamp(16px,2vw,30px);
+}
+.g-kicker{
+  font-size:clamp(10.5px,1.3vmin,12.5px);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin:0 clamp(22px,4.2vw,56px) 22px;
+}
+#rail{
+  display:flex;
+  gap:clamp(18px,2.4vw,30px);
+  overflow-x:auto;
+  /* proximity, not mandatory — mandatory snap traps two-finger vertical
+     scrolling when the pointer rests over the rail */
+  scroll-snap-type:x proximity;
+  overscroll-behavior-x:contain;
+  padding:6px clamp(22px,4.2vw,56px) 26px;
+  scrollbar-width:none;
+  cursor:grab;
+  outline:none;
+}
+#rail::-webkit-scrollbar{ display:none; }
+#rail.dragging{ cursor:grabbing; scroll-snap-type:none; }
+#rail figure{
+  flex:none;
+  scroll-snap-align:center;
+  height:min(44vw,560px);
+  border:1px solid var(--hair);
+  border-radius:14px;
+  overflow:hidden;
+  background:rgba(250,248,243,.7);
+  box-shadow:0 22px 54px rgba(38,32,44,.13), 0 3px 10px rgba(38,32,44,.05);
+}
+#rail img{
+  height:100%;
+  width:auto;
+  display:block;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+.g-nav{
+  display:flex; align-items:center; gap:18px;
+  margin:2px clamp(22px,4.2vw,56px) 0;
+  color:var(--muted);
+  font-size:clamp(10.5px,1.3vmin,12.5px);
+  letter-spacing:.2em;
+}
+.g-nav button{
+  width:40px; height:40px;
+  border:1px solid var(--hair);
+  border-radius:50%;
+  background:rgba(250,248,243,.78);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+  color:var(--ink);
+  font-size:20px; line-height:1;
+  cursor:pointer;
+  transition:color .25s ease, border-color .25s ease;
+}
+.g-nav button:hover{ color:var(--pink); border-color:var(--pink); }
+
+/* ==================== the nitty-gritty ==================== */
+
+#info{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:clamp(32px,4vw,56px) clamp(48px,6vw,96px);
+  max-width:1060px;
+  margin:0 auto;
+  padding:clamp(28px,3vw,52px) clamp(22px,4.2vw,56px) clamp(20px,2.5vw,40px);
+}
+.i-block{ border-top:1px solid var(--hair); padding-top:1.5em; }
+.i-kicker{
+  font-size:clamp(10.5px,1.3vmin,12.5px);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.i-body, .i-list{
+  margin-top:1em;
+  font-family:'EB Garamond', Georgia, serif;
+  font-weight:500;
+  font-size:clamp(15.5px,1.95vmin,18.5px);
+  line-height:1.62;
+  opacity:.88;
+}
+.i-list{ list-style:none; }
+.i-list li{ padding-left:1.2em; position:relative; }
+.i-list li + li{ margin-top:.7em; }
+.i-list li::before{
+  content:'·';
+  position:absolute; left:.2em;
+  color:var(--pink);
+}
+
+/* ==================== closing invitation ==================== */
+
+#outro{
+  display:flex; flex-direction:column; align-items:center;
+  text-align:center;
+  padding:clamp(22px,2.5vw,40px) 22px clamp(96px,8vw,128px);
+}
+.o-rule{ width:34px; height:1px; background:var(--hair); margin-bottom:1.6em; }
+.o-name{
+  font-family:'Cormorant Garamond', Georgia, serif;
+  font-weight:500;
+  font-size:clamp(24px,3.2vmin,34px);
+}
+.o-num{
+  margin:.6em 0 1.3em;
+  font-size:clamp(10.5px,1.3vmin,12.5px);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* ========================== corners ========================== */
+
+#back{
+  position:absolute; left:clamp(22px,4.2vw,56px); bottom:clamp(18px,3.4vh,34px);
+  z-index:3;
+  color:var(--muted);
+  text-decoration:none;
+  font-size:clamp(11px,1.35vmin,13px);
+  letter-spacing:.1em;
+  transition:color .25s ease;
+}
+#back:hover{ color:var(--pink); }
+
+#brand{
+  position:absolute; right:clamp(22px,4.2vw,56px); bottom:clamp(16px,3vh,30px);
+  z-index:3; pointer-events:none;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+#brand img{
+  width:clamp(54px,6.5vmin,78px);
+  height:auto;
+  opacity:.88;
+  mix-blend-mode:multiply;
+}
+#brand span{
+  font-size:clamp(9.5px,1.15vmin,11px);
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* ========================== portrait ========================== */
+
+@media (max-width: 700px){
+  #hero{
+    grid-template-columns:1fr;
+    padding-top:clamp(72px,18vw,104px);
+    padding-bottom:24px;
+    min-height:0;
+  }
+  #pieceSlot{ height:min(92vw, 430px); }
+  #copy{ max-width:none; padding:26px 2px 0; }
+  #copy .para{ font-size:clamp(16px,4.5vw,19px); }
+  #rail figure{ height:min(96vw,440px); }
+  #info{ grid-template-columns:1fr; gap:30px; }
+  #outro{ padding-bottom:150px; }
+  #brand img{ width:48px; }
+  #brand span{ display:none; }   /* logo only — the wordmark collides with the back link */
+}
+
+@media (prefers-reduced-motion: reduce){
+  .cta{ transition:none; }
+}
