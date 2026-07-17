@@ -123,7 +123,19 @@ What the tool does (and the scars behind it):
    (`roughWashGloss`), fresnel hover glow. `side: DoubleSide` so hollow shells
    stay solid.
 
-Target ~1.2–1.8 MB per piece (~90k tris). Budget ~8 MB per collection page.
+6. **Meshopt-compress** the final GLBs: `npx gltf-transform meshopt in.glb out.glb`
+   (lossless geometry, ~62% smaller — 5MB→1.9MB for 4 pieces; masks that
+   took 5-7s to download now ~2s, product pages keep full detail). Then
+   register the decoder on EVERY app that loads them (collection + all
+   product pages — they share `assets/*.glb`, so a missing decoder = broken
+   pieces): `import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js'`
+   + `new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)`. Bump ASSET_V/assetV.
+
+**Loading bar** (collection page): a thin 2px `#loadbar` (pink, no text) driven
+by the GLB download progress (`loader.load`'s onProgress, summed loaded/total
+across the 4 files), `.done` class fades it out on Promise.all resolve.
+
+Target ~0.4–0.6 MB per meshopt piece. Budget ~2 MB per collection page.
 
 ## Verifying in the hidden preview tab
 
