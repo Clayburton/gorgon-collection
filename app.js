@@ -487,6 +487,10 @@ function navigate(i) {
   const r = relics[i];
   if (!r || !r.prod.url) return;
   flash.classList.add('go');
+  // tell the host page to fade the WHOLE viewport white — otherwise a sibling
+  // block peeking above/below stays gray while this one whites out (see the
+  // shared listener in wordpress-embed.html)
+  if (window.parent !== window) { try { parent.postMessage({ ckd: 'flash' }, '*'); } catch (_) {} }
   setTimeout(() => {
     try { window.top.location.href = r.prod.url; }
     catch (_) { window.location.href = r.prod.url; }

@@ -26,3 +26,31 @@
     });
   })();
 </script>
+
+<!-- ============================================================
+     SHARED CKD FADE-TO-WHITE — paste this IDENTICAL block inside
+     EVERY CKD Custom HTML block on the page. It installs once (guard
+     below), listens for {ckd:'flash'} from any CKD iframe, and fades
+     the WHOLE viewport white — so clicking an object in one block
+     fades every other block (and any peeking sliver) with it.
+     Pure CSS opacity, GPU-composited, zero JS per frame — no lag.
+     ============================================================ -->
+<script>
+  (function () {
+    if (window.__ckdFlash) return;              // install once per page
+    window.__ckdFlash = true;
+    var ov = document.createElement('div');
+    ov.setAttribute('aria-hidden', 'true');
+    ov.style.cssText =
+      'position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;' +
+      'z-index:2147483647;transition:opacity .32s ease;';
+    (document.body || document.documentElement).appendChild(ov);
+    addEventListener('message', function (e) {
+      if (e.origin !== 'https://clayburton.github.io') return;
+      if (e.data && e.data.ckd === 'flash') {
+        ov.style.pointerEvents = 'auto';
+        ov.style.opacity = '1';
+      }
+    });
+  })();
+</script>
