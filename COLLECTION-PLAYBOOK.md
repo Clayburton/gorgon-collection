@@ -158,6 +158,12 @@ WP product page via its own `wordpress-embed.html`. Clone `baroque/` and swap:
   NEVER `position:fixed`**: fixed elements misbehave inside iOS iframes
   (every page here ships in a WP iframe) and skip rasterization in hidden
   tabs. World y maps page pixels; the piece scrolls with its slot.
+- **Product-page embeds run TWO modes** (`baroque/wordpress-embed.html`):
+  desktop iframe stays viewport-sized (`calc(100dvh - 84px)`) and the page
+  scrolls INSIDE it — trackpad momentum never crosses the iframe boundary
+  (cross-frame scroll handoff was the "sticky scroll"); phones (≤700px) grow
+  the iframe via postMessage because iOS forces iframes to fit content.
+  Long-scroll pages must never rely on parent-page scrolling on desktop.
 - **Inside a self-growing iframe, viewport-height units are poison.** The
   iframe grows to fit content → svh/vh/aspect-ratio queries see the GROWN
   height → taller layout → grows again, until the desktop page wears the
