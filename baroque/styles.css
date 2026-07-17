@@ -49,7 +49,9 @@ body{ min-height:100%; position:relative; }
   grid-template-columns: 54% 46%;
   align-items:center;
   min-height:min(68svh, 58vw);
-  padding:clamp(40px,4vw,72px) clamp(22px,4.2vw,56px) clamp(16px,1.8vw,30px);
+  /* generous top pad clears the site menu bar with air; bottom stays tight so
+     the photos still peek */
+  padding:clamp(64px,6.5vw,108px) clamp(22px,4.2vw,56px) clamp(16px,1.8vw,30px);
 }
 #pieceSlot{ height:min(56svh, 44vw); }
 
