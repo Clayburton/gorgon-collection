@@ -3,5 +3,6 @@ const PHOTOS = [
   { src: 'photos/01.jpg', w: 1600, h: 2000 },
   { src: 'photos/02.jpg', w: 1600, h: 2000 },
   { src: 'photos/03.jpg', w: 1330, h: 1662 },
+  { src: 'photos/04.jpg', w: 1600, h: 1600 },
 ];
 export default PHOTOS;
