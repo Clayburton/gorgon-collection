@@ -1,9 +1,22 @@
 <!-- CKDesign — Medusa, Baroque Europe (CK_007) · WordPress Custom HTML block.
      Paste this WHOLE file into one Custom HTML block on /medusa-baroque-europe/.
-     The iframe grows to fit the page (it posts its height up). -->
+     ⚠ REPLACES the earlier embed block — re-paste, don't keep both.
+
+     Desktop: the iframe stays viewport-sized and the PAGE SCROLLS INSIDE IT —
+     trackpad momentum never crosses the iframe boundary (that handoff was the
+     scroll stutter). Phones: iOS forces iframes to fit their content, so the
+     iframe grows to the page's posted height and the WP page scrolls. -->
 <style>
   #ckd-baroque{ width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); }
-  #ckd-baroque iframe{ display:block; width:100%; height:100svh; height:100dvh; border:0; }
+  #ckd-baroque iframe{
+    display:block; width:100%; border:0;
+    /* viewport minus the site header bar so the whole page shows */
+    height:calc(100svh - 84px); height:calc(100dvh - 84px);
+  }
+  @media (max-width:700px){
+    /* height is driven by the page's postMessage below */
+    #ckd-baroque iframe{ height:100svh; height:100dvh; }
+  }
 </style>
 <div id="ckd-baroque">
   <iframe id="ckd-baroque-frame"
@@ -18,7 +31,9 @@
     addEventListener('message', function (e) {
       if (e.origin !== 'https://clayburton.github.io') return;
       var d = e.data || {};
-      if (d.ckd === 'height' && typeof d.h === 'number' && d.h > 200 && d.h < 12000) {
+      // only phones grow the iframe; desktop scrolls inside it
+      if (d.ckd === 'height' && typeof d.h === 'number' && d.h > 200 && d.h < 12000
+          && matchMedia('(max-width:700px)').matches) {
         frame.style.height = Math.round(d.h) + 'px';
       }
     });
