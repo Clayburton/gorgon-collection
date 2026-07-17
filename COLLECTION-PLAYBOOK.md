@@ -166,6 +166,23 @@ When browser numbers look impossible, inspect the GLB file directly.
   monster by turns, reimagined by every age that inherited her. Impossible to
   look away from."
 
+## The Odyssey (2026-07) — second room, mirrored
+
+- Lives at `odyssey/` in the same repo; shares `assets/` (paths are
+  `../assets/*.glb`, its own `ASSET_V`). Cave-gray palette (`--paper:#e7e5e1`),
+  **masthead top-RIGHT** (`right:` + `text-align:right` +
+  `.tagline{margin-left:auto}`) so stacked collections on /design/ alternate
+  text-left / text-right; scatter mirrored to keep the masthead column clear.
+- **Long taglines eat into the scatter at mid-width windows (~1000–1300px):**
+  font clamps bottom out in px, so an 8-line tagline extends much deeper than
+  the reference 4-liner. Check ~1280×720, not just full desktop — drop the
+  masthead-side pieces low enough (`y ≈ -0.4`, center piece below the
+  paragraph) that nothing rides under the text.
+- **Both collection iframes sit on one WP page**, so the height postMessage
+  uses a distinct key per collection (`{ckdCol:'odyssey',h}` vs the Gorgons'
+  `ckd:'height'`) and each embed block filters on its own key — otherwise the
+  phones' column-height messages resize BOTH iframes.
+
 ## Product pages (one per piece — `baroque/` is the reference instance)
 
 Each piece gets a subfolder page (`<repo>/<piece>/` on Pages), embedded on its
