@@ -329,7 +329,7 @@ Promise.all(COLLECTION.products.map((p, i) => new Promise((res, rej) =>
 }).catch(err => { console.error('GLB load failed', err); showFallback(); });
 
 /* ============================= LAYOUT ============================= */
-let halfW = 1, halfH = 1, portrait = false;
+let halfW = 1, halfH = 1, portrait = false, coarse = false;
 let lastGlW = 0, lastGlH = 0, lastPostedH = 0;
 function layout() {
   const w = stage.clientWidth || innerWidth || 1200;
@@ -374,7 +374,7 @@ function layout() {
   halfH = P.camDist * Math.tan(THREE.MathUtils.degToRad(P.fov / 2));
   halfW = halfH * camera.aspect;
 
-  const coarse = matchMedia('(pointer:coarse)').matches;
+  coarse = matchMedia('(pointer:coarse)').matches;
   const camHome = new THREE.Vector3(0, 0, P.camDist);
   const pxToWorld = 2 * halfH / h;
   relics.forEach((r, i) => {
@@ -531,7 +531,7 @@ function step(t, dt) {
     const eOut = 1 - eIn;
 
     // hover / recede targets (no recede in menu mode — phones keep every piece full)
-    const menuMode = portrait || matchMedia('(pointer:coarse)').matches;
+    const menuMode = portrait || coarse;    // cached in layout() — matchMedia every frame is waste
     const want = (focus === i) ? 1 : 0;
     const wantDim = (focus >= 0 && focus !== i && !menuMode) ? 1 : 0;
     r.hover += (want - r.hover) * kh;
@@ -595,9 +595,23 @@ function renderOnce(t) {
 }
 
 let frozen = false;
+
+/* render only while actually on screen — /design/ stacks two live WebGL rooms
+   and the off-screen one was burning a full GPU frame the whole time you
+   looked at the other. IntersectionObserver sees the top-level viewport even
+   from inside a cross-origin iframe. */
+let onScreen = true;
+if ('IntersectionObserver' in window) {
+  new IntersectionObserver((entries) => {
+    const vis = entries[entries.length - 1].isIntersecting;
+    if (vis && !onScreen) { last = perfNow(); renderOnce(perfNow() * 0.001); }
+    onScreen = vis;
+  }).observe(canvas);
+}
+
 function tick() {
   requestAnimationFrame(tick);
-  if (frozen) return;
+  if (frozen || !onScreen) return;
   const now = perfNow();
   const dt = Math.min((now - last) / 1000, 0.05);
   last = now;

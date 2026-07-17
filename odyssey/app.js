@@ -19,8 +19,7 @@ const COLLECTION = {
     { id:'odysseus', name:'Odysseus, King of Ithaca', date:'Homer’s Odyssey',
       url:'https://clayandkelsy.com/odyssey-odysseus-king-of-ithaca/', file:'../assets/odysseus.glb' },
     { id:'athena',   name:'Athena / Minerva',         date:'1st–2nd century AD',
-      url:'https://clayandkelsy.com/odyssey-athena-minerva/', file:'../assets/athena.glb',
-      hoverScale: 1.10 },   // the slimmest bust — meets the others at full hover
+      url:'https://clayandkelsy.com/odyssey-athena-minerva/', file:'../assets/athena.glb' },
     { id:'cyclops',  name:'Polyphemus, The Cyclops',  date:'2nd century',
       url:'https://clayandkelsy.com/odyssey-polyphemus-the-cyclops/', file:'../assets/cyclops.glb' },
     { id:'shepherd', name:'Polyphemus, The Shepherd', date:'2nd century',
@@ -29,8 +28,8 @@ const COLLECTION = {
   /* cave wall: cool stone grays (the Gorgon room is warm paper — this one is
      Polyphemus's cave), moodier veins, soft light pulled a little off-center */
   backdrop: {
-    center:'#eae8e4', edge:'#c4c1bb',
-    vein:'#8f8c85', veinAmount:0.24,
+    center:'#dedad3', edge:'#a8a49c',      // darker cave wall — the pale masks stand proud of it
+    vein:'#767269', veinAmount:0.26,
     grain:11, seed:19,
     lightX:0.46, lightY:0.34,
   },
@@ -46,11 +45,14 @@ const COLLECTION = {
   },
   /* landscape scatter — MIRRORED vs the Gorgon room: masthead sits top-RIGHT,
      pieces flow left + center (scroll rhythm: Gorgon text left → Odyssey right) */
+  /* featured: Odysseus (center) + Athena (upper-left), both large; the two
+     Polyphemus masks are the supporting pair — same size, same baseline,
+     flanking bottom-left / bottom-right */
   scatterL: [
-    { x:-0.04, y:-0.02, z:-0.20, s:1.00 },   // Odysseus — the hero, center stage (sits below the long tagline)
-    { x:-0.44, y: 0.42, z:-0.35, s:0.94 },   // Athena — the goddess, watching from above
-    { x:-0.62, y:-0.32, z: 0.05, s:0.98 },   // Cyclops — lurking low
-    { x: 0.52, y:-0.42, z: 0.15, s:0.95 },   // Shepherd — lower right, clear of the masthead column
+    { x:-0.06, y:-0.10, z:-0.16, s:1.10 },   // Odysseus — the hero, center stage, featured
+    { x:-0.50, y: 0.50, z:-0.28, s:1.16 },   // Athena — the goddess, featured, watching from above
+    { x:-0.66, y:-0.56, z: 0.05, s:0.80 },   // Cyclops — bottom-left of the pair
+    { x: 0.52, y:-0.56, z: 0.05, s:0.80 },   // Shepherd — bottom-right, mirrors the Cyclops
   ],
 };
 
@@ -67,8 +69,8 @@ const P = {
   hover:    { scale: 1.045, tiltX: -0.055, tiltY: 0.085, lambda: 7 },
   rot:      { max: 0.26, perPx: 1 / 220, lambda: 9 },    // click-drag inspect (~15°)
   dim:      { opacity: 0.45, scale: 0.97, lambda: 6 },   // non-focused pieces recede
-  light:    { key: 1.35, fill: 0.5, rim: 0.85, env: 0.5, exposure: 1.0 },
-  grade:    { grain: 0.026, vignette: 0.26, contrast: 1.028, centerLight: 0.05 },
+  light:    { key: 1.35, fill: 0.5, rim: 0.95, env: 0.5, exposure: 1.0 },
+  grade:    { grain: 0.026, vignette: 0.26, contrast: 1.038, centerLight: 0.05 },
   clickPx: 7,
   topClear: 0.10,                 // keep pieces out of the top strip (menu bar)
 };
@@ -323,16 +325,15 @@ Promise.all(COLLECTION.products.map((p, i) => new Promise((res, rej) =>
 
   layout();
   renderer.compile(scene, camera);
-  // staggered entrance: each piece fades + rises in (driven inside step —
-  // it's the same per-frame opacity/scale write the focus-dim already does)
-  const t0 = perfNow() * 0.001 + 0.1;
-  relics.forEach((r, i) => { r.bornAt = t0 + i * 0.14; });
+  // no entrance choreography in this room — it sits below the fold on /design/,
+  // so by the time you scroll to it the masks should simply BE there
+  relics.forEach((r) => { r.bornAt = -1e9; });
   renderOnce(perfNow() * 0.001);
   requestAnimationFrame(tick);
 }).catch(err => { console.error('GLB load failed', err); showFallback(); });
 
 /* ============================= LAYOUT ============================= */
-let halfW = 1, halfH = 1, portrait = false;
+let halfW = 1, halfH = 1, portrait = false, coarse = false;
 let lastGlW = 0, lastGlH = 0, lastPostedH = 0;
 function layout() {
   const w = stage.clientWidth || innerWidth || 1200;
@@ -380,7 +381,7 @@ function layout() {
   halfH = P.camDist * Math.tan(THREE.MathUtils.degToRad(P.fov / 2));
   halfW = halfH * camera.aspect;
 
-  const coarse = matchMedia('(pointer:coarse)').matches;
+  coarse = matchMedia('(pointer:coarse)').matches;
   const camHome = new THREE.Vector3(0, 0, P.camDist);
   const pxToWorld = 2 * halfH / h;
   relics.forEach((r, i) => {
@@ -537,7 +538,7 @@ function step(t, dt) {
     const eOut = 1 - eIn;
 
     // hover / recede targets (no recede in menu mode — phones keep every piece full)
-    const menuMode = portrait || matchMedia('(pointer:coarse)').matches;
+    const menuMode = portrait || coarse;    // cached in layout() — matchMedia every frame is waste
     const want = (focus === i) ? 1 : 0;
     const wantDim = (focus >= 0 && focus !== i && !menuMode) ? 1 : 0;
     r.hover += (want - r.hover) * kh;
@@ -601,9 +602,23 @@ function renderOnce(t) {
 }
 
 let frozen = false;
+
+/* render only while actually on screen — /design/ stacks two live WebGL rooms
+   and the off-screen one was burning a full GPU frame the whole time you
+   looked at the other (the "just a bit laggy"). IntersectionObserver sees the
+   top-level viewport even from inside a cross-origin iframe. */
+let onScreen = true;
+if ('IntersectionObserver' in window) {
+  new IntersectionObserver((entries) => {
+    const vis = entries[entries.length - 1].isIntersecting;
+    if (vis && !onScreen) { last = perfNow(); renderOnce(perfNow() * 0.001); }
+    onScreen = vis;
+  }).observe(canvas);
+}
+
 function tick() {
   requestAnimationFrame(tick);
-  if (frozen) return;
+  if (frozen || !onScreen) return;
   const now = perfNow();
   const dt = Math.min((now - last) / 1000, 0.05);
   last = now;

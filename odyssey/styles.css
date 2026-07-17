@@ -1,7 +1,7 @@
 :root{
-  --paper:#e7e5e1;   /* cave gray — this room is cool stone, not the Gorgons' warm tan */
+  --paper:#dedad3;   /* cave gray, a shade darker — the pale masks stand proud of it */
   --ink:#26202c;
-  --muted:#6b6570;
+  --muted:#57525c;   /* a step darker than the Gorgon room's — readable on the deeper wall */
   --pink:#cc5f97;
   --hair:rgba(38,32,44,.16);
 }
