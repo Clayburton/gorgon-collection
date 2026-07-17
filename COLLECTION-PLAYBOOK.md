@@ -52,6 +52,17 @@ look, behave, and get built. Read it top to bottom before building the next one.
   auto-resizing parent iframe feedback-loops) and never from viewport
   fractions (that's what caused v0.2's dead top band + cut-off last piece).
   The page posts its height to the WP embed, which grows the iframe.
+- **Portrait detection is WIDTH-FIRST** (`w < 700 || aspect < 0.9`) —
+  `innerHeight` lies inside iOS iframes (they expand to content), so a phone
+  can read as "landscape" by aspect alone and get the desktop scatter. Width
+  catches every phone; aspect still catches narrow desktop windows.
+- **Entrance**: pieces fade + rise in with a ~140ms stagger (0.9s smoothstep
+  per piece, `bornAt` set once assets are ready). It's computed inside the
+  existing per-frame opacity/scale writes — zero added cost. Placards wait
+  for `eIn > 0.6`; `prefers-reduced-motion` skips it entirely.
+- **`pageshow` + `persisted` → `location.reload()`** on every page —
+  back/forward cache restores a dead WebGL context (the "back button loads
+  nothing" bug). The reload is instant since assets are cached.
 - **Resizing across the portrait/landscape boundary must be clean both ways**
   — `layout()` clears `stage.style.height`, placard `.on` classes and inline
   opacity resolve in `step()`; `pointerleave` clears the hovered piece.
