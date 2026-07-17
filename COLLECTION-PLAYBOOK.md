@@ -164,12 +164,14 @@ WP product page via its own `wordpress-embed.html`. Clone `baroque/` and swap:
   (cross-frame scroll handoff was the "sticky scroll"); phones (≤700px) grow
   the iframe via postMessage because iOS forces iframes to fit content.
   Long-scroll pages must never rely on parent-page scrolling on desktop.
-- **Inside a self-growing iframe, viewport-height units are poison.** The
-  iframe grows to fit content → svh/vh/aspect-ratio queries see the GROWN
-  height → taller layout → grows again, until the desktop page wears the
-  phone layout. Every block height must be **width-based or px-capped**
-  (`min(100svh, 58vw)` hero, `min(44vw, 560px)` rail, etc.) and breakpoints
-  go by `max-width`, never aspect-ratio. This bit the baroque page live.
+- **svh is only honest when the iframe is viewport-sized.** Desktop embed:
+  iframe stays viewport-sized and scrolls internally → svh == real screen, use
+  it freely (hero, piece, peek all svh-based). Phone embed: iframe GROWS to
+  content → svh there would inflate and feed back into a taller layout, so the
+  `max-width:700px` block zeroes the hero `min-height` and sizes the piece by
+  vw/px instead. Breakpoints go by `max-width`, never `aspect-ratio` (aspect
+  ratio also reads the grown height). Earlier the desktop iframe grew too and
+  svh was poison everywhere — the two-mode embed is what made svh safe again.
 - **Perf recipe for product pages**: DPR capped at 1.5 (page-tall canvas),
   render loop fully paused while the hero is offscreen (IntersectionObserver),
   piece position cached at layout (page coords are scroll-independent — no
@@ -180,17 +182,28 @@ WP product page via its own `wordpress-embed.html`. Clone `baroque/` and swap:
   first image eager + high priority, rest lazy.
 - `overflow-x: clip` on html/body — `hidden` makes body a scroll container
   and stutters macOS momentum scrolling.
-- Hero is `min(92svh, 52vw)` so the `[ photographs ]` kicker + frame tops
-  peek above the fold — visitors see there's more below.
+- **Hero sizing — tie the piece to the hero, both svh-based.** The 3D piece
+  (`#pieceSlot height: min(56svh, 44vw)`) and the hero (`min-height:
+  min(68svh, 58vw)`) share the SAME viewport-height basis, so the piece fills
+  the hero instead of floating in it. The classic bug: sizing the piece by
+  WIDTH while the hero is by HEIGHT — on a tall monitor they diverge, the piece
+  rattles around with big top/bottom gaps, and the extra hero height shoves the
+  photos off-screen. Keep the hero tight (≈ piece + small padding) so the
+  `[ photographs ]` kicker + frame tops peek above the fold. vw caps only bind
+  on ultrawide-short screens. (Verified live: piece fills hero, photos peek
+  210–260px at 1440×900 and 1728×1085.)
 - **Info section** (`#info`, standard for every piece — copy is shared):
   2×2 editorial grid (1-col portrait), hairline top rules, mono `[ kicker ]`
   + EB Garamond body, pink `·` bullets: the details / care / from the makers /
   shipping & returns.
 - **Outro** (`#outro`): centered closing block above the footer corners —
-  hairline rule, serif name, mono `CK_0NN · $price`, second add-to-cart.
-- **CTA = solid-ink button** (mono brackets + arrow chip inside, ink→pink
-  hover). Both buttons share `.cart-link`; JS sets `href` + `target="_top"`
-  from `PIECE.cartUrl` (baroque = WooCommerce id **6385**, verified live).
+  hairline rule, serif name, mono **`$price` only, then the second
+  add-to-cart**. NO CK number here (it lives once in the hero kicker
+  `[ Gorgon Collection — CK_0NN ]`; repeating it above the button reads messy).
+- **CTA = solid-ink button, mono brackets, NO arrow chip** (the chip was
+  redundant next to the brackets — removed). Ink→pink hover, lifts 1px. Both
+  buttons share `.cart-link`; JS sets `href` + `target="_top"` from
+  `PIECE.cartUrl` (baroque = WooCommerce id **6385**, verified live).
 
 ## Ideas noted for future collections (not yet built)
 
