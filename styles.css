@@ -25,6 +25,19 @@ body{ min-height:100%; overflow-x:hidden; }
   overflow:hidden;
 }
 
+/* minimal loading bar — thin, no text, fills as the masks download then fades */
+#loadbar{
+  position:absolute; top:0; left:0;
+  height:2px; width:0;
+  background:var(--pink);
+  z-index:6;
+  opacity:.85;
+  transition:width .3s ease, opacity .5s ease .25s;
+  pointer-events:none;
+}
+#loadbar.done{ opacity:0; }
+@media (prefers-reduced-motion: reduce){ #loadbar{ transition:opacity .3s ease; } }
+
 #gl{
   position:absolute; inset:0;
   width:100%; height:100%;

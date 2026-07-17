@@ -5,6 +5,7 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -12,7 +13,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import PHOTOS from './photos.js';
 
 const PIECE = {
-  file: '../assets/baroque.glb', assetV: 5,
+  file: '../assets/baroque.glb', assetV: 6,
   cartUrl: 'https://clayandkelsy.com/cart/?add-to-cart=6385',   // WooCommerce product 6385
 };
 
@@ -208,7 +209,7 @@ const piece = {
 piece.slot.add(piece.spin);
 scene.add(piece.slot);
 
-new GLTFLoader().load(PIECE.file + '?v=' + PIECE.assetV, (gltf) => {
+new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(PIECE.file + '?v=' + PIECE.assetV, (gltf) => {
   let src = null;
   gltf.scene.updateMatrixWorld(true);
   gltf.scene.traverse(o => { if (o.isMesh && !src) src = o; });

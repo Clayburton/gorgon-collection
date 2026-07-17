@@ -5,6 +5,7 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -245,12 +246,25 @@ function makeStoneWash(f) {
 
 /* ============================= RELICS ============================= */
 const relics = [];   // { slot, spin, mesh, mat, prod, label, home, pos, sBase, sCur, hover, dim, phase, labelBelow }
-const loader = new GLTFLoader();
-const ASSET_V = 5;   // bump after every model reconversion — GLBs cache like scripts do
+const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);   // GLBs are meshopt-compressed
+const ASSET_V = 6;   // bump after every model reconversion — GLBs cache like scripts do
 
-Promise.all(COLLECTION.products.map(p => new Promise((res, rej) =>
-  loader.load(p.file + '?v=' + ASSET_V, res, undefined, rej)
+/* minimal top loading bar — fills as the (meshopt) GLBs download, then fades */
+const loadbar = document.getElementById('loadbar');
+const _loaded = new Array(COLLECTION.products.length).fill(0);
+const _total = new Array(COLLECTION.products.length).fill(0);
+function updateLoadbar() {
+  if (!loadbar) return;
+  const l = _loaded.reduce((a, b) => a + b, 0), t = _total.reduce((a, b) => a + b, 0);
+  if (t > 0) loadbar.style.width = Math.min(96, (l / t) * 100) + '%';
+}
+
+Promise.all(COLLECTION.products.map((p, i) => new Promise((res, rej) =>
+  loader.load(p.file + '?v=' + ASSET_V, res,
+    (e) => { if (e.lengthComputable) { _loaded[i] = e.loaded; _total[i] = e.total; updateLoadbar(); } },
+    rej)
 ))).then(gltfs => {
+  if (loadbar) { loadbar.style.width = '100%'; loadbar.classList.add('done'); }
   gltfs.forEach((gltf, i) => {
     const prod = COLLECTION.products[i];
     let src = null;
