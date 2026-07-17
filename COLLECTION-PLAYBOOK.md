@@ -183,6 +183,21 @@ When browser numbers look impossible, inspect the GLB file directly.
   `ckd:'height'`) and each embed block filters on its own key — otherwise the
   phones' column-height messages resize BOTH iframes.
 
+## Head order + loading (both rooms, keep exactly this)
+
+1. `<script type="importmap">` FIRST — before any `modulepreload`. Preloads
+   before the map break back-nav/refresh from cache: the map registers "too
+   late", bare `'three'` fails to resolve, the module dies silently and the
+   failure is cached (blank masks, refresh doesn't heal). Verified repro +
+   fix 2026-07-17.
+2. `preconnect` to cdn.jsdelivr.net, then `modulepreload` three + the six
+   addons, then `<link rel="preload" as="fetch" crossorigin>` for each GLB
+   (starts the mask downloads with the HTML; `crossorigin` makes it match
+   GLTFLoader's fetch — verify single-fetch in the network log after any
+   change). Keep the `?v=` in the preload URL in sync with `ASSET_V`.
+3. Render-loop hygiene: IntersectionObserver pauses `tick()` off-screen
+   (two rooms share /design/); `pointer:coarse` cached in `layout()`.
+
 ## Product pages (one per piece — `baroque/` is the reference instance)
 
 Each piece gets a subfolder page (`<repo>/<piece>/` on Pages), embedded on its
