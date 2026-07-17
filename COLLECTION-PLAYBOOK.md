@@ -168,8 +168,23 @@ WP product page via its own `wordpress-embed.html`. Clone `baroque/` and swap:
   render loop fully paused while the hero is offscreen (IntersectionObserver),
   piece position cached at layout (page coords are scroll-independent — no
   per-frame rect reads). ~0.2ms/frame; scrolling the gallery costs zero GPU.
-- Photos strip: scroll-snap rail, frosted ‹ › buttons + `NN / NN` counter,
+- Photos strip: scroll-snap rail (`x proximity`, NEVER mandatory — mandatory
+  traps two-finger vertical scrolling over the rail; plus
+  `overscroll-behavior-x:contain`), frosted ‹ › buttons + `NN / NN` counter,
   first image eager + high priority, rest lazy.
+- `overflow-x: clip` on html/body — `hidden` makes body a scroll container
+  and stutters macOS momentum scrolling.
+- Hero is `min(92svh, 52vw)` so the `[ photographs ]` kicker + frame tops
+  peek above the fold — visitors see there's more below.
+- **Info section** (`#info`, standard for every piece — copy is shared):
+  2×2 editorial grid (1-col portrait), hairline top rules, mono `[ kicker ]`
+  + EB Garamond body, pink `·` bullets: the details / care / from the makers /
+  shipping & returns.
+- **Outro** (`#outro`): centered closing block above the footer corners —
+  hairline rule, serif name, mono `CK_0NN · $price`, second add-to-cart.
+- **CTA = solid-ink button** (mono brackets + arrow chip inside, ink→pink
+  hover). Both buttons share `.cart-link`; JS sets `href` + `target="_top"`
+  from `PIECE.cartUrl` (baroque = WooCommerce id **6385**, verified live).
 
 ## Ideas noted for future collections (not yet built)
 
