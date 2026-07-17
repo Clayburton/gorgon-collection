@@ -25,14 +25,14 @@ const P = {
   tumble:   { amp: 0.05, speed: 0.3 },
   rot:      { max: 0.32, perPx: 1 / 200, lambda: 9 },   // drag-inspect (~18°)
   enter:    { dur: 2.6, keyY: -3.0 },   // spooky reveal: main white light rises from below to rest
-  light:    { key: 1.35, fill: 0.5, rim: 0.85, env: 0.5, exposure: 1.0 },
-  grade:    { grain: 0.026, vignette: 0.26, contrast: 1.028, centerLight: 0.05 },
+  light:    { key: 1.42, fill: 0.5, rim: 1.12, env: 0.5, exposure: 1.0 },
+  grade:    { grain: 0.026, vignette: 0.1, contrast: 1.05, centerLight: 0.045 },
   /* the Odyssey's darker cave wall — matches the collection room */
-  backdrop: { center:'#dedad3', edge:'#a8a49c', vein:'#767269', veinAmount:0.26,
+  backdrop: { center:'#dedad3', edge:'#cbc7c0', vein:'#767269', veinAmount:0.26,
               grain:11, seed:21, lightX:0.46, lightY:0.34 },
   /* lighter than the collection tuning — at 4× magnification the wash reads
      heavy, and the piece sits right above photos of the real bone-gray cast */
-  finish:   { base:0xf3f1ec, washGamma:0.62, rough:0.66, roughWashGloss:0.12,
+  finish:   { base:0xeeeae2, washGamma:0.82, rough:0.66, roughWashGloss:0.12,
               roughVar:0.08, clearcoat:0.04, sheen:0.24, sheenColor:0xf6f1e6,
               veinAmount:0.08, veinScale:2.6, env:0.55, hoverTint:0xfff3e4 },
 };

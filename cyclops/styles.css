@@ -247,11 +247,12 @@ body{ min-height:100%; position:relative; }
   font-size:clamp(24px,3.2vmin,34px);
 }
 .o-num{
-  margin:.6em 0 1.3em;
-  font-size:clamp(10.5px,1.3vmin,12.5px);
-  letter-spacing:.2em;
-  text-transform:uppercase;
-  color:var(--muted);
+  margin:.4em 0 1.05em;
+  font-family:'Cormorant Garamond', Georgia, serif;
+  font-weight:600;
+  font-size:clamp(30px,4vmin,44px);
+  letter-spacing:.01em;
+  color:var(--ink);
 }
 
 /* ========================== corners ========================== */
