@@ -13,7 +13,10 @@ html,body{
   color:var(--ink);
   font-family:'Courier Prime', ui-monospace, monospace;
 }
-body{ min-height:100%; overflow-x:hidden; position:relative; }
+/* overflow-x: CLIP, not hidden — hidden makes body a scroll container and
+   breaks macOS momentum scrolling; clip only crops */
+html,body{ overflow-x:clip; }
+body{ min-height:100%; position:relative; }
 
 /* the gallery wall: paper backdrop spanning the whole page (absolute, not
    fixed — fixed elements misbehave inside iOS iframes and skip rasterization
@@ -43,8 +46,9 @@ body{ min-height:100%; overflow-x:hidden; position:relative; }
   display:grid;
   grid-template-columns: 54% 46%;
   align-items:center;
-  min-height:min(100svh, 58vw);
-  padding:clamp(84px,7vw,132px) clamp(22px,4.2vw,56px) clamp(56px,5vw,96px);
+  /* 92svh, not 100: the tops of the photographs peek above the fold */
+  min-height:min(92svh, 52vw);
+  padding:clamp(84px,7vw,132px) clamp(22px,4.2vw,56px) clamp(48px,4vw,84px);
 }
 #pieceSlot{ height:min(40vw, 620px); }
 
@@ -90,34 +94,44 @@ body{ min-height:100%; overflow-x:hidden; position:relative; }
   font-size:clamp(30px,4vmin,44px);
   letter-spacing:.01em;
 }
-/* CTA speaks the house language: mono brackets + the placards' arrow chip */
+/* CTA: a real button in the house voice — solid ink, mono brackets, arrow chip */
 .cta{
   display:inline-flex;
   align-items:center;
-  gap:.7em;
-  color:var(--ink);
+  gap:.8em;
+  padding:.95em 1.55em;
+  background:var(--ink);
+  border:1px solid var(--ink);
+  border-radius:9px;
+  color:#f4f0e8;
   text-decoration:none;
   font-size:clamp(12px,1.5vmin,14px);
   letter-spacing:.16em;
   text-transform:uppercase;
-  transition:color .25s ease;
+  box-shadow:0 12px 30px rgba(38,32,44,.20), 0 2px 6px rgba(38,32,44,.10);
+  transition:background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease;
 }
 .cta .lnk{
   flex:none;
   width:1.5em; height:1.5em;
-  border:1px solid var(--hair);
+  border:1px solid rgba(244,240,232,.4);
   border-radius:4px;
   display:grid; place-items:center;
-  color:var(--muted);
-  transition:color .25s ease, border-color .25s ease, transform .25s ease;
+  color:#f4f0e8;
+  transition:transform .25s ease, border-color .25s ease;
 }
 .cta .lnk svg{ width:.6em; height:.6em; display:block; }
-.cta:hover{ color:var(--pink); }
-.cta:hover .lnk{ color:var(--pink); border-color:var(--pink); transform:translate(1px,-1px); }
+.cta:hover{
+  background:var(--pink);
+  border-color:var(--pink);
+  transform:translateY(-1px);
+  box-shadow:0 16px 38px rgba(38,32,44,.24), 0 2px 6px rgba(38,32,44,.10);
+}
+.cta:hover .lnk{ transform:translate(1px,-1px); border-color:rgba(255,255,255,.6); }
 .cta.pulse{ animation:ctaPulse .5s ease; }
 @keyframes ctaPulse{
   0%{ transform:scale(1); }
-  35%{ transform:scale(.97); color:var(--pink); }
+  35%{ transform:scale(.97); }
   100%{ transform:scale(1); }
 }
 .micro{
@@ -144,7 +158,10 @@ body{ min-height:100%; overflow-x:hidden; position:relative; }
   display:flex;
   gap:clamp(18px,2.4vw,30px);
   overflow-x:auto;
-  scroll-snap-type:x mandatory;
+  /* proximity, not mandatory — mandatory snap traps two-finger vertical
+     scrolling when the pointer rests over the rail */
+  scroll-snap-type:x proximity;
+  overscroll-behavior-x:contain;
   padding:6px clamp(22px,4.2vw,56px) 26px;
   scrollbar-width:none;
   cursor:grab;
@@ -190,6 +207,61 @@ body{ min-height:100%; overflow-x:hidden; position:relative; }
 }
 .g-nav button:hover{ color:var(--pink); border-color:var(--pink); }
 
+/* ==================== the nitty-gritty ==================== */
+
+#info{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:clamp(36px,4.5vw,64px) clamp(48px,6vw,96px);
+  max-width:1060px;
+  margin:0 auto;
+  padding:clamp(40px,5vw,72px) clamp(22px,4.2vw,56px) clamp(24px,3vw,44px);
+}
+.i-block{ border-top:1px solid var(--hair); padding-top:1.5em; }
+.i-kicker{
+  font-size:clamp(10.5px,1.3vmin,12.5px);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.i-body, .i-list{
+  margin-top:1em;
+  font-family:'EB Garamond', Georgia, serif;
+  font-weight:500;
+  font-size:clamp(15.5px,1.95vmin,18.5px);
+  line-height:1.62;
+  opacity:.88;
+}
+.i-list{ list-style:none; }
+.i-list li{ padding-left:1.2em; position:relative; }
+.i-list li + li{ margin-top:.7em; }
+.i-list li::before{
+  content:'·';
+  position:absolute; left:.2em;
+  color:var(--pink);
+}
+
+/* ==================== closing invitation ==================== */
+
+#outro{
+  display:flex; flex-direction:column; align-items:center;
+  text-align:center;
+  padding:clamp(28px,3.5vw,52px) 22px clamp(150px,16vw,200px);
+}
+.o-rule{ width:34px; height:1px; background:var(--hair); margin-bottom:2.2em; }
+.o-name{
+  font-family:'Cormorant Garamond', Georgia, serif;
+  font-weight:500;
+  font-size:clamp(24px,3.2vmin,34px);
+}
+.o-num{
+  margin:.7em 0 1.6em;
+  font-size:clamp(10.5px,1.3vmin,12.5px);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
 /* ========================== corners ========================== */
 
 #back{
@@ -234,6 +306,8 @@ body{ min-height:100%; overflow-x:hidden; position:relative; }
   #copy{ max-width:none; padding:26px 2px 0; }
   #copy .para{ font-size:clamp(16px,4.5vw,19px); }
   #rail figure{ height:min(96vw,440px); }
+  #info{ grid-template-columns:1fr; gap:34px; }
+  #outro{ padding-bottom:170px; }
   #brand img{ width:48px; }
   #brand span{ display:none; }   /* logo only — the wordmark collides with the back link */
 }

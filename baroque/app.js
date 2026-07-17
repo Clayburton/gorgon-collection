@@ -13,7 +13,7 @@ import PHOTOS from './photos.js';
 
 const PIECE = {
   file: '../assets/baroque.glb', assetV: 5,
-  cartUrl: null,               // set to the WooCommerce ?add-to-cart= link when live
+  cartUrl: 'https://clayandkelsy.com/cart/?add-to-cart=6385',   // WooCommerce product 6385
 };
 
 const P = {
@@ -331,16 +331,20 @@ function endInspect() {
 canvas.addEventListener('pointerup', endInspect);
 canvas.addEventListener('pointercancel', endInspect);
 
-/* cart button — no product link yet: a soft acknowledging pulse */
-const cart = document.getElementById('cart');
-cart.addEventListener('click', (e) => {
-  if (!PIECE.cartUrl) {
-    e.preventDefault();
-    cart.classList.remove('pulse'); void cart.offsetWidth;
-    cart.classList.add('pulse');
+/* cart buttons (hero + outro) — live WooCommerce link opens in the TOP window
+   (this page ships inside an iframe); without a link they pulse politely */
+document.querySelectorAll('.cart-link').forEach((btn) => {
+  if (PIECE.cartUrl) {
+    btn.href = PIECE.cartUrl;
+    btn.target = '_top';
+  } else {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      btn.classList.remove('pulse'); void btn.offsetWidth;
+      btn.classList.add('pulse');
+    });
   }
 });
-if (PIECE.cartUrl) cart.href = PIECE.cartUrl;
 
 /* ============================= MOTION ============================= */
 const perfNow = () => performance.now();
