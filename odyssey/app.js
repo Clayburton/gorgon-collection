@@ -47,10 +47,10 @@ const COLLECTION = {
   /* landscape scatter — MIRRORED vs the Gorgon room: masthead sits top-RIGHT,
      pieces flow left + center (scroll rhythm: Gorgon text left → Odyssey right) */
   scatterL: [
-    { x: 0.02, y: 0.10, z:-0.20, s:1.00 },   // Odysseus — the hero, center stage
+    { x:-0.04, y:-0.02, z:-0.20, s:1.00 },   // Odysseus — the hero, center stage (sits below the long tagline)
     { x:-0.44, y: 0.42, z:-0.35, s:0.94 },   // Athena — the goddess, watching from above
     { x:-0.62, y:-0.32, z: 0.05, s:0.98 },   // Cyclops — lurking low
-    { x: 0.48, y:-0.30, z: 0.15, s:0.95 },   // Shepherd — lower right
+    { x: 0.52, y:-0.42, z: 0.15, s:0.95 },   // Shepherd — lower right, clear of the masthead column
   ],
 };
 
