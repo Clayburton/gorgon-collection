@@ -404,6 +404,10 @@ function tick() {
 canvas.addEventListener('webglcontextlost', (e) => e.preventDefault());
 canvas.addEventListener('webglcontextrestored', () => { layout(); renderOnce(perfNow() * 0.001); });
 
+/* back/forward cache restores the page with a dead GL context — self-reload
+   is instant since every asset is cached */
+addEventListener('pageshow', (e) => { if (e.persisted) location.reload(); });
+
 /* ============================= GALLERY ============================= */
 const rail = document.getElementById('rail');
 const count = document.getElementById('gCount');

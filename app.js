@@ -299,12 +299,17 @@ Promise.all(COLLECTION.products.map(p => new Promise((res, rej) =>
       sBase: 1, sCur: 1, hover: 0, dim: 0,
       phase: Math.random() * Math.PI * 2,
       labelBelow: true,
+      bornAt: Infinity,          // entrance start time, set once everything is ready
     });
   });
 
   layout();
   renderer.compile(scene, camera);
-  renderOnce(0);
+  // staggered entrance: each piece fades + rises in (driven inside step —
+  // it's the same per-frame opacity/scale write the focus-dim already does)
+  const t0 = perfNow() * 0.001 + 0.1;
+  relics.forEach((r, i) => { r.bornAt = t0 + i * 0.14; });
+  renderOnce(perfNow() * 0.001);
   requestAnimationFrame(tick);
 }).catch(err => { console.error('GLB load failed', err); showFallback(); });
 
@@ -312,7 +317,10 @@ Promise.all(COLLECTION.products.map(p => new Promise((res, rej) =>
 let halfW = 1, halfH = 1, portrait = false;
 function layout() {
   const w = stage.clientWidth || innerWidth || 1200;
-  portrait = w > 0 && (w / Math.max(innerHeight, 1)) < 0.9;
+  // width first — innerHeight lies inside iOS iframes (they expand to content),
+  // so a phone can read as "landscape" by aspect; aspect still catches narrow
+  // desktop windows and portrait tablets
+  portrait = w > 0 && (w < 700 || (w / Math.max(innerHeight, 1)) < 0.9);
 
   /* portrait: pixel-measured column — masthead height + N × (piece + placard).
      Width/content-driven only (never innerHeight), so the stage is exactly as
@@ -485,18 +493,23 @@ function step(t, dt) {
     const kh = 1 - Math.exp(-P.hover.lambda * dt);
     const kd = 1 - Math.exp(-P.dim.lambda * dt);
 
+    // entrance: fade + rise, smoothstep-eased (free — same writes as the dim)
+    const ent = REDUCE ? 1 : THREE.MathUtils.clamp((t - r.bornAt) / 0.9, 0, 1);
+    const eIn = ent * ent * (3 - 2 * ent);
+
     // hover / recede targets
     const want = (focus === i) ? 1 : 0;
     const wantDim = (focus >= 0 && focus !== i) ? 1 : 0;
     r.hover += (want - r.hover) * kh;
     r.dim += (wantDim - r.dim) * kd;
     r.mat.userData.u.uHover.value = r.hover;
-    r.mat.opacity = 1 - (1 - P.dim.opacity) * r.dim;
+    r.mat.opacity = (1 - (1 - P.dim.opacity) * r.dim) * eIn;
 
     // position: gentle bob only (pieces hold their museum posts)
     const live = REDUCE ? 0 : 1 - r.hover * 0.6;
     r.slot.position.copy(r.pos);
-    r.slot.position.y += Math.sin(t * P.bob.speed + r.phase * 2.1) * P.bob.amp * live;
+    r.slot.position.y += Math.sin(t * P.bob.speed + r.phase * 2.1) * P.bob.amp * live
+      - (1 - eIn) * 0.2;
 
     // click-drag inspect: this piece follows the drag (±~15°), others stay put
     const kr = 1 - Math.exp(-P.rot.lambda * dt);
@@ -517,7 +530,7 @@ function step(t, dt) {
     const hs = r.prod.hoverScale || P.hover.scale;
     const sTarget = r.sBase * (1 + (hs - 1) * r.hover) * (1 - (1 - P.dim.scale) * r.dim);
     r.sCur += (sTarget - r.sCur) * kh;
-    r.spin.scale.setScalar(r.sCur);
+    r.spin.scale.setScalar(r.sCur * (0.955 + 0.045 * eIn));
 
     // placard under the piece
     const show = r.label.classList.contains('on') || r.hover > 0.12;
@@ -528,7 +541,8 @@ function step(t, dt) {
       r.label.style.transform =
         `translate(${((V2.x + 1) / 2 * w).toFixed(1)}px, ${((-V2.y + 1) / 2 * h).toFixed(1)}px) translate(-50%, 14px)`;
     }
-    const alwaysOn = portrait || matchMedia('(pointer:coarse)').matches;
+    // placards wait for their piece to be mostly in before showing
+    const alwaysOn = (portrait || matchMedia('(pointer:coarse)').matches) && eIn > 0.6;
     r.label.classList.toggle('on', alwaysOn || r.hover > 0.12);
     r.label.style.opacity = alwaysOn && r.dim > 0.02 ? String(1 - r.dim * 0.55) : '';
   });
@@ -557,6 +571,10 @@ function tick() {
 
 canvas.addEventListener('webglcontextlost', (e) => e.preventDefault());
 canvas.addEventListener('webglcontextrestored', () => { layout(); renderOnce(perfNow() * 0.001); });
+
+/* back/forward cache restores the page with a dead GL context (blank canvas,
+   frozen loop) — a self-reload is instant since every asset is cached */
+addEventListener('pageshow', (e) => { if (e.persisted) location.reload(); });
 
 /* ============================= FALLBACK ============================= */
 function showFallback() {
