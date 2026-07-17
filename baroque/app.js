@@ -24,6 +24,7 @@ const P = {
   bob:      { amp: 0.045, speed: 0.4 },
   tumble:   { amp: 0.05, speed: 0.3 },
   rot:      { max: 0.32, perPx: 1 / 200, lambda: 9 },   // drag-inspect (~18°)
+  enter:    { dur: 2.6, keyY: -3.0 },   // spooky reveal: main white light rises from below to rest
   light:    { key: 1.35, fill: 0.5, rim: 0.85, env: 0.5, exposure: 1.0 },
   grade:    { grain: 0.026, vignette: 0.26, contrast: 1.028, centerLight: 0.05 },
   backdrop: { center:'#f6f2ea', edge:'#e3dccd', vein:'#b9b0a0', veinAmount:0.16,
@@ -108,6 +109,7 @@ scene.add(fill);
 const rim = new THREE.DirectionalLight(0xeef4ff, P.light.rim);
 rim.position.set(-1.2, 5.2, -4.5);
 scene.add(rim);
+const KEY_REST_Y = key.position.y;   // the entrance eases the key up to this resting height
 
 const GradeShader = {
   uniforms: { tDiffuse:{value:null}, uTime:{value:0}, uGrain:{value:P.grade.grain},
@@ -226,6 +228,7 @@ new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(PIECE.file + '?v=' + PIE
   face.add(piece.mesh);
   piece.spin.add(face);
 
+  enterT0 = perfNow() * 0.001;   // begin the spooky underlight reveal
   layout();
   renderer.compile(scene, camera);
   renderOnce(0);
@@ -236,15 +239,22 @@ new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(PIECE.file + '?v=' + PIE
 /* the canvas spans the WHOLE page; world y maps page pixels, so the piece
    sits at its slot's page position and scrolls naturally with the content */
 let halfW = 1, halfH = 1, pageW = 1280, pageH = 720;
+let lastGlW = 0, lastGlH = 0;
 let slotCache = { cx: 0.3, cy: 0.25, size: 400 };   // page fractions fallback
 
 function layout() {
   pageW = innerWidth || 1280;
   pageH = Math.max(document.body.scrollHeight, innerHeight || 720);
-  renderer.setSize(pageW, pageH, false);
-  composer.setSize(pageW, pageH);
-  camera.aspect = pageW / pageH;
-  camera.updateProjectionMatrix();
+  // reallocate the GL buffer ONLY when the size truly changes — the body's
+  // ResizeObserver fires as photos lazy-load, and each unguarded setSize
+  // flashes the canvas ("thunder")
+  if (pageW !== lastGlW || pageH !== lastGlH) {
+    lastGlW = pageW; lastGlH = pageH;
+    renderer.setSize(pageW, pageH, false);
+    composer.setSize(pageW, pageH);
+    camera.aspect = pageW / pageH;
+    camera.updateProjectionMatrix();
+  }
   halfH = P.camDist * Math.tan(THREE.MathUtils.degToRad(P.fov / 2));
   halfW = halfH * camera.aspect;
   placePiece();
@@ -361,6 +371,7 @@ document.querySelectorAll('.cart-link').forEach((btn) => {
 /* ============================= MOTION ============================= */
 const perfNow = () => performance.now();
 let last = perfNow();
+let enterT0 = null;   // set when the piece loads → drives the one-shot underlight reveal
 const camCur = { yaw: 0, pitch: 0 };
 
 function step(t, dt) {
@@ -395,6 +406,15 @@ function step(t, dt) {
     if (wantHot !== hot) { hot = wantHot; canvas.classList.toggle('is-hot', hot); }
     const u = piece.mat.userData.u.uHover;
     u.value += (((hot || rotting) ? 0.55 : 0) - u.value) * (1 - Math.exp(-7 * dt));
+  }
+
+  // spooky underlight reveal — the main white (key) light starts below the piece
+  // and eases up to its resting height; plays once, right as she loads in
+  if (enterT0 !== null) {
+    const e = THREE.MathUtils.clamp((t - enterT0) / P.enter.dur, 0, 1);
+    const eased = 1 - Math.pow(1 - e, 3);   // ease-out cubic
+    key.position.y = P.enter.keyY + (KEY_REST_Y - P.enter.keyY) * eased;
+    if (e >= 1) enterT0 = null;             // settled — hands off the light
   }
 
   grade.uniforms.uTime.value = t;
