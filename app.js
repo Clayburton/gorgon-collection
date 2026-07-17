@@ -574,8 +574,12 @@ function step(t, dt) {
       V2.copy(r.slot.position); V2.y -= r.sCur * (r.halfHgt + 0.04);
       V2.project(camera);
       const w = stage.clientWidth || innerWidth, h = stage.clientHeight || innerHeight;
+      // clamp: a low-hung piece's placard must never run off the bottom of the
+      // stage or over the corner hint text (it rides up onto the piece instead)
+      const ph = r.label.offsetHeight || 84;
+      const py = Math.min((-V2.y + 1) / 2 * h, h - ph - 62);
       r.label.style.transform =
-        `translate(${((V2.x + 1) / 2 * w).toFixed(1)}px, ${((-V2.y + 1) / 2 * h).toFixed(1)}px) translate(-50%, 14px)`;
+        `translate(${((V2.x + 1) / 2 * w).toFixed(1)}px, ${py.toFixed(1)}px) translate(-50%, 14px)`;
     }
     // placards wait for their piece to be mostly in before showing
     const alwaysOn = menuMode && eIn > 0.6;

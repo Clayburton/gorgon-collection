@@ -49,10 +49,10 @@ const COLLECTION = {
      Polyphemus masks are the supporting pair — same size, same baseline,
      flanking bottom-left / bottom-right */
   scatterL: [
-    { x:-0.04, y:-0.10, z:-0.16, s:1.22 },   // Odysseus — the hero, center stage, featured
+    { x:-0.04, y:-0.02, z:-0.16, s:1.22 },   // Odysseus — the hero, center stage, featured
     { x:-0.52, y: 0.52, z:-0.28, s:1.30 },   // Athena — the goddess, featured, watching from above
-    { x:-0.68, y:-0.56, z: 0.05, s:0.96 },   // Cyclops — bottom-left of the pair
-    { x: 0.54, y:-0.56, z: 0.05, s:0.96 },   // Shepherd — bottom-right, mirrors the Cyclops
+    { x:-0.68, y:-0.52, z: 0.05, s:0.96 },   // Cyclops — bottom-left of the pair
+    { x: 0.54, y:-0.52, z: 0.05, s:0.96 },   // Shepherd — bottom-right, mirrors the Cyclops
   ],
 };
 
@@ -581,8 +581,12 @@ function step(t, dt) {
       V2.copy(r.slot.position); V2.y -= r.sCur * (r.halfHgt + 0.04);
       V2.project(camera);
       const w = stage.clientWidth || innerWidth, h = stage.clientHeight || innerHeight;
+      // clamp: a low-hung piece's placard must never run off the bottom of the
+      // stage or over the corner hint text (it rides up onto the piece instead)
+      const ph = r.label.offsetHeight || 84;
+      const py = Math.min((-V2.y + 1) / 2 * h, h - ph - 62);
       r.label.style.transform =
-        `translate(${((V2.x + 1) / 2 * w).toFixed(1)}px, ${((-V2.y + 1) / 2 * h).toFixed(1)}px) translate(-50%, 14px)`;
+        `translate(${((V2.x + 1) / 2 * w).toFixed(1)}px, ${py.toFixed(1)}px) translate(-50%, 14px)`;
     }
     // placards wait for their piece to be mostly in before showing
     const alwaysOn = menuMode && eIn > 0.6;
