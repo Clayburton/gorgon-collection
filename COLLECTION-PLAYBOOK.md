@@ -56,11 +56,11 @@ look, behave, and get built. Read it top to bottom before building the next one.
   `innerHeight` lies inside iOS iframes (they expand to content), so a phone
   can read as "landscape" by aspect alone and get the desktop scatter. Width
   catches every phone; aspect still catches narrow desktop windows.
-- **Entrance**: pieces fade + rise + **turn to face you** (alternating ±0.5rad
-  yaw, easing to rest) with a ~140ms stagger (`P.enter`, 0.95s smoothstep per
-  piece, `bornAt` set once assets are ready). Computed inside the existing
-  per-frame opacity/scale/rotation writes — zero added cost. Placards wait for
-  `eIn > 0.6`; `prefers-reduced-motion` skips it entirely.
+- **NO entrance animation — pieces pop in the moment their GLBs land.** The
+  fade/rise/turn-to-face load-in (`P.enter`/`bornAt`/`eIn`) was tried and
+  Clay removed it 2026-07-17: it made the load FEEL slower than the instant
+  pop. The code is deleted from both engines; don't reintroduce it on future
+  collections. The thin loading bar is the only load feedback.
 - **Touch is not hover**: clear `hotIdx`/glow on any non-mouse `pointerup`/
   `pointercancel` — a scroll's pointerdown "hovers" whatever was under the
   finger and otherwise never releases it (one piece stuck highlighted, rest
