@@ -64,7 +64,6 @@ const P = {
   objScaleP: 1.12,                // portrait column: vs half width
   parallax: { yaw: 2.4, pitch: 1.7 },
   bob:      { amp: 0.05, speed: 0.42 },
-  enter:    { dur: 0.95, rise: 0.2, tiltX: 0.16, tiltY: -0.5, scale: 0.93 },  // load-in: turn-to-face + settle
   tumble:   { amp: 0.05, speed: 0.3 },
   hover:    { scale: 1.045, tiltX: -0.055, tiltY: 0.085, lambda: 7 },
   rot:      { max: 0.26, perPx: 1 / 220, lambda: 9 },    // click-drag inspect (~15°)
@@ -319,15 +318,13 @@ Promise.all(COLLECTION.products.map((p, i) => new Promise((res, rej) =>
       sBase: 1, sCur: 1, hover: 0, dim: 0,
       phase: Math.random() * Math.PI * 2,
       labelBelow: true,
-      bornAt: Infinity,          // entrance start time, set once everything is ready
     });
   });
 
   layout();
   renderer.compile(scene, camera);
-  // no entrance choreography in this room — it sits below the fold on /design/,
-  // so by the time you scroll to it the masks should simply BE there
-  relics.forEach((r) => { r.bornAt = -1e9; });
+  // no entrance choreography — the masks simply ARE there the moment they
+  // finish downloading (quicker, snappier; per Clay)
   renderOnce(perfNow() * 0.001);
   requestAnimationFrame(tick);
 }).catch(err => { console.error('GLB load failed', err); showFallback(); });
@@ -532,11 +529,6 @@ function step(t, dt) {
     const kh = 1 - Math.exp(-P.hover.lambda * dt);
     const kd = 1 - Math.exp(-P.dim.lambda * dt);
 
-    // entrance: fade + rise + a turn-to-face-you settle (free — same writes as the dim)
-    const ent = REDUCE ? 1 : THREE.MathUtils.clamp((t - r.bornAt) / P.enter.dur, 0, 1);
-    const eIn = ent * ent * (3 - 2 * ent);
-    const eOut = 1 - eIn;
-
     // hover / recede targets (no recede in menu mode — phones keep every piece full)
     const menuMode = portrait || coarse;    // cached in layout() — matchMedia every frame is waste
     const want = (focus === i) ? 1 : 0;
@@ -544,13 +536,12 @@ function step(t, dt) {
     r.hover += (want - r.hover) * kh;
     r.dim += (wantDim - r.dim) * kd;
     r.mat.userData.u.uHover.value = r.hover;
-    r.mat.opacity = (1 - (1 - P.dim.opacity) * r.dim) * eIn;
+    r.mat.opacity = 1 - (1 - P.dim.opacity) * r.dim;
 
     // position: gentle bob only (pieces hold their museum posts)
     const live = REDUCE ? 0 : 1 - r.hover * 0.6;
     r.slot.position.copy(r.pos);
-    r.slot.position.y += Math.sin(t * P.bob.speed + r.phase * 2.1) * P.bob.amp * live
-      - eOut * P.enter.rise;
+    r.slot.position.y += Math.sin(t * P.bob.speed + r.phase * 2.1) * P.bob.amp * live;
 
     // click-drag inspect: this piece follows the drag (±~15°), others stay put
     const kr = 1 - Math.exp(-P.rot.lambda * dt);
@@ -562,18 +553,16 @@ function step(t, dt) {
     const ph = r.phase;
     r.spin.rotation.x = r.baseTilt.x
       + (Math.sin(t * P.tumble.speed + ph) * 0.6 + Math.sin(t * P.tumble.speed * 1.7 + ph * 3.1) * 0.4) * P.tumble.amp * live
-      + P.hover.tiltX * r.hover + r.rotX
-      + eOut * P.enter.tiltX;
+      + P.hover.tiltX * r.hover + r.rotX;
     r.spin.rotation.y = r.baseTilt.y
       + (Math.cos(t * P.tumble.speed * 0.8 + ph * 1.6) * 0.6 + Math.sin(t * P.tumble.speed * 1.3 + ph * 2.2) * 0.4) * P.tumble.amp * live
-      + P.hover.tiltY * r.hover + r.rotY
-      + eOut * (i % 2 ? -P.enter.tiltY : P.enter.tiltY);
+      + P.hover.tiltY * r.hover + r.rotY;
 
     // scale: slight grow on hover (per-piece override), recede when unfocused
     const hs = r.prod.hoverScale || P.hover.scale;
     const sTarget = r.sBase * (1 + (hs - 1) * r.hover) * (1 - (1 - P.dim.scale) * r.dim);
     r.sCur += (sTarget - r.sCur) * kh;
-    r.spin.scale.setScalar(r.sCur * (P.enter.scale + (1 - P.enter.scale) * eIn));
+    r.spin.scale.setScalar(r.sCur);
 
     // placard under the piece
     const show = r.label.classList.contains('on') || r.hover > 0.12;
@@ -588,8 +577,7 @@ function step(t, dt) {
       r.label.style.transform =
         `translate(${((V2.x + 1) / 2 * w).toFixed(1)}px, ${py.toFixed(1)}px) translate(-50%, 14px)`;
     }
-    // placards wait for their piece to be mostly in before showing
-    const alwaysOn = menuMode && eIn > 0.6;
+    const alwaysOn = menuMode;
     r.label.classList.toggle('on', alwaysOn || r.hover > 0.12);
     r.label.style.opacity = alwaysOn && r.dim > 0.02 ? String(1 - r.dim * 0.55) : '';
   });
