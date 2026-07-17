@@ -58,6 +58,7 @@ const P = {
   objScaleP: 1.12,                // portrait column: vs half width
   parallax: { yaw: 2.4, pitch: 1.7 },
   bob:      { amp: 0.05, speed: 0.42 },
+  enter:    { dur: 0.95, rise: 0.2, tiltX: 0.16, tiltY: -0.5, scale: 0.93 },  // load-in: turn-to-face + settle
   tumble:   { amp: 0.05, speed: 0.3 },
   hover:    { scale: 1.045, tiltX: -0.055, tiltY: 0.085, lambda: 7 },
   rot:      { max: 0.26, perPx: 1 / 220, lambda: 9 },    // click-drag inspect (~15°)
@@ -315,6 +316,7 @@ Promise.all(COLLECTION.products.map(p => new Promise((res, rej) =>
 
 /* ============================= LAYOUT ============================= */
 let halfW = 1, halfH = 1, portrait = false;
+let lastGlW = 0, lastGlH = 0, lastPostedH = 0;
 function layout() {
   const w = stage.clientWidth || innerWidth || 1200;
   // width first — innerHeight lies inside iOS iframes (they expand to content),
@@ -336,16 +338,25 @@ function layout() {
   } else if (stage.style.height) {
     stage.style.height = '';
   }
-  // let a WordPress embed grow its iframe to fit the column
-  if (window.parent !== window) {
-    try { parent.postMessage({ ckd: 'height', h: stage.clientHeight || innerHeight }, '*'); } catch (_) {}
+  // let a WordPress embed grow its iframe to fit the column (only when it changes —
+  // re-posting on every layout ping-pongs with the growing iframe)
+  const postH = stage.clientHeight || innerHeight;
+  if (window.parent !== window && postH !== lastPostedH) {
+    lastPostedH = postH;
+    try { parent.postMessage({ ckd: 'height', h: postH }, '*'); } catch (_) {}
   }
 
   const h = stage.clientHeight || innerHeight || 800;
-  renderer.setSize(w, h, false);
-  composer.setSize(w, h);
-  camera.aspect = w / h;
-  camera.updateProjectionMatrix();
+  // resize the GL surface only when dimensions actually changed — every setSize
+  // reallocates the backing buffer and flashes; the growing mobile iframe fires
+  // a burst of resizes during load (that was the "crazy glitch")
+  if (w !== lastGlW || h !== lastGlH) {
+    lastGlW = w; lastGlH = h;
+    renderer.setSize(w, h, false);
+    composer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
   halfH = P.camDist * Math.tan(THREE.MathUtils.degToRad(P.fov / 2));
   halfW = halfH * camera.aspect;
 
@@ -439,20 +450,27 @@ function endInspect() {
   rotT.x = 0; rotT.y = 0;                        // piece eases back to rest
   canvas.classList.remove('is-grab');
 }
+function clearTouchHover(e) {
+  // touch has no hover: a scroll's pointerdown "hovers" whatever was under the
+  // finger and nothing ever clears it — one piece stays highlighted, the rest dim
+  if (e.pointerType !== 'mouse') {
+    hotIdx = -1; pointerOn = false; ndc.set(0, -2);
+    canvas.classList.remove('is-hot');
+  }
+}
 canvas.addEventListener('pointerup', (e) => {
   const still = Math.hypot(e.clientX - downX, e.clientY - downY) <= P.clickPx;
   const idx = downIdx;
   downIdx = -1;
   endInspect();
+  clearTouchHover(e);
   if (still && idx >= 0) activate(idx);          // a drag never navigates
   else if (still && idx < 0) selected = -1;
 });
-canvas.addEventListener('pointercancel', () => { downIdx = -1; endInspect(); });
+canvas.addEventListener('pointercancel', (e) => { downIdx = -1; endInspect(); clearTouchHover(e); });
 
 function activate(i) {
-  // touch: first tap presents the piece, second tap (or the placard) opens it
-  if (matchMedia('(pointer:coarse)').matches && selected !== i) { selected = i; return; }
-  navigate(i);
+  navigate(i);                                   // one tap or click opens the piece
 }
 
 function navigate(i) {
@@ -493,13 +511,15 @@ function step(t, dt) {
     const kh = 1 - Math.exp(-P.hover.lambda * dt);
     const kd = 1 - Math.exp(-P.dim.lambda * dt);
 
-    // entrance: fade + rise, smoothstep-eased (free — same writes as the dim)
-    const ent = REDUCE ? 1 : THREE.MathUtils.clamp((t - r.bornAt) / 0.9, 0, 1);
+    // entrance: fade + rise + a turn-to-face-you settle (free — same writes as the dim)
+    const ent = REDUCE ? 1 : THREE.MathUtils.clamp((t - r.bornAt) / P.enter.dur, 0, 1);
     const eIn = ent * ent * (3 - 2 * ent);
+    const eOut = 1 - eIn;
 
-    // hover / recede targets
+    // hover / recede targets (no recede in menu mode — phones keep every piece full)
+    const menuMode = portrait || matchMedia('(pointer:coarse)').matches;
     const want = (focus === i) ? 1 : 0;
-    const wantDim = (focus >= 0 && focus !== i) ? 1 : 0;
+    const wantDim = (focus >= 0 && focus !== i && !menuMode) ? 1 : 0;
     r.hover += (want - r.hover) * kh;
     r.dim += (wantDim - r.dim) * kd;
     r.mat.userData.u.uHover.value = r.hover;
@@ -509,7 +529,7 @@ function step(t, dt) {
     const live = REDUCE ? 0 : 1 - r.hover * 0.6;
     r.slot.position.copy(r.pos);
     r.slot.position.y += Math.sin(t * P.bob.speed + r.phase * 2.1) * P.bob.amp * live
-      - (1 - eIn) * 0.2;
+      - eOut * P.enter.rise;
 
     // click-drag inspect: this piece follows the drag (±~15°), others stay put
     const kr = 1 - Math.exp(-P.rot.lambda * dt);
@@ -521,16 +541,18 @@ function step(t, dt) {
     const ph = r.phase;
     r.spin.rotation.x = r.baseTilt.x
       + (Math.sin(t * P.tumble.speed + ph) * 0.6 + Math.sin(t * P.tumble.speed * 1.7 + ph * 3.1) * 0.4) * P.tumble.amp * live
-      + P.hover.tiltX * r.hover + r.rotX;
+      + P.hover.tiltX * r.hover + r.rotX
+      + eOut * P.enter.tiltX;
     r.spin.rotation.y = r.baseTilt.y
       + (Math.cos(t * P.tumble.speed * 0.8 + ph * 1.6) * 0.6 + Math.sin(t * P.tumble.speed * 1.3 + ph * 2.2) * 0.4) * P.tumble.amp * live
-      + P.hover.tiltY * r.hover + r.rotY;
+      + P.hover.tiltY * r.hover + r.rotY
+      + eOut * (i % 2 ? -P.enter.tiltY : P.enter.tiltY);
 
     // scale: slight grow on hover (per-piece override), recede when unfocused
     const hs = r.prod.hoverScale || P.hover.scale;
     const sTarget = r.sBase * (1 + (hs - 1) * r.hover) * (1 - (1 - P.dim.scale) * r.dim);
     r.sCur += (sTarget - r.sCur) * kh;
-    r.spin.scale.setScalar(r.sCur * (0.955 + 0.045 * eIn));
+    r.spin.scale.setScalar(r.sCur * (P.enter.scale + (1 - P.enter.scale) * eIn));
 
     // placard under the piece
     const show = r.label.classList.contains('on') || r.hover > 0.12;
@@ -542,7 +564,7 @@ function step(t, dt) {
         `translate(${((V2.x + 1) / 2 * w).toFixed(1)}px, ${((-V2.y + 1) / 2 * h).toFixed(1)}px) translate(-50%, 14px)`;
     }
     // placards wait for their piece to be mostly in before showing
-    const alwaysOn = (portrait || matchMedia('(pointer:coarse)').matches) && eIn > 0.6;
+    const alwaysOn = menuMode && eIn > 0.6;
     r.label.classList.toggle('on', alwaysOn || r.hover > 0.12);
     r.label.style.opacity = alwaysOn && r.dim > 0.02 ? String(1 - r.dim * 0.55) : '';
   });

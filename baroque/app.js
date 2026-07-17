@@ -323,10 +323,14 @@ canvas.addEventListener('pointerdown', (e) => {
     try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
   }
 });
-function endInspect() {
+function endInspect(e) {
   isDown = false; rotting = false;
   rotT.x = 0; rotT.y = 0;
   canvas.classList.remove('is-grab');
+  if (e && e.pointerType !== 'mouse') {          // touch has no hover — release the glow
+    hot = false; pointerOn = false; ndc.set(0, -2);
+    canvas.classList.remove('is-hot');
+  }
 }
 canvas.addEventListener('pointerup', endInspect);
 canvas.addEventListener('pointercancel', endInspect);
