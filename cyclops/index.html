@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#dedad3">
+<title>Polyphemus, The Cyclops — CKDesign</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏺</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=1">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<!-- THE IMPORT MAP MUST COME BEFORE ANY modulepreload (see COLLECTION-PLAYBOOK
+     § Head order — preloads-before-map kill the module from cache). -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+  }
+}
+</script>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/loaders/GLTFLoader.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/libs/meshopt_decoder.module.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/environments/RoomEnvironment.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/postprocessing/EffectComposer.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/postprocessing/RenderPass.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/postprocessing/ShaderPass.js">
+<link rel="preload" as="fetch" crossorigin href="../assets/cyclops.glb?v=1">
+</head>
+<body>
+
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<main id="page">
+
+  <section id="hero">
+    <div id="pieceSlot" aria-hidden="true"></div>
+    <div id="copy">
+      <p class="kicker mono">[ The Odyssey &mdash; CK_005 ]</p>
+      <h1 class="title">Polyphemus,<br>The Cyclops</h1>
+      <p class="era">2nd century</p>
+      <p class="para">Polyphemus, the one-eyed Cyclops who trapped Odysseus in his cave &mdash; here in his monstrous form. Hand-painted and sealed, inspired by ancient depictions, he&rsquo;s a piece of Homer&rsquo;s Odyssey for your wall or fridge.</p>
+      <div class="buy">
+        <span class="price">$42.00</span>
+        <a id="cart" class="cta cart-link mono" href="#" data-cart="">[ add to cart ]</a>
+      </div>
+      <p class="micro mono">hand-painted &amp; sealed &middot; ships from our studio</p>
+    </div>
+  </section>
+
+  <section id="gallery">
+    <p class="g-kicker mono">[ photographs ]</p>
+    <div id="rail" tabindex="0" aria-label="photographs of the piece"></div>
+    <div class="g-nav mono">
+      <button id="gPrev" aria-label="previous photo">&lsaquo;</button>
+      <span id="gCount">01 / 01</span>
+      <button id="gNext" aria-label="next photo">&rsaquo;</button>
+    </div>
+  </section>
+
+  <section id="info">
+    <div class="i-block">
+      <p class="i-kicker mono">[ the details ]</p>
+      <ul class="i-list">
+        <li>3D printed in PLA, then hand-painted in acrylic and sealed with a
+        protective clear coat &mdash; so no two are ever exactly alike.</li>
+        <li>About 50&ndash;60&thinsp;mm across (roughly 2&ndash;2.4 inches).</li>
+        <li>Five small magnets are set into the back &mdash; enough to hold a few
+        sheets of paper, a photo, or a small stack of receipts on any steel
+        surface. These are decorative art magnets, not heavy-duty holders.</li>
+        <li>Every order includes a small piece of removable putty, so it can
+        live on a wall, shelf, or altar too &mdash; not just the fridge.</li>
+      </ul>
+    </div>
+    <div class="i-block">
+      <p class="i-kicker mono">[ care ]</p>
+      <p class="i-body">Each piece is hand-painted and sealed to last &mdash; to keep
+      the colors vivid, keep it out of prolonged direct sunlight and wipe clean
+      with a dry or slightly damp cloth. No soaking.</p>
+    </div>
+    <div class="i-block">
+      <p class="i-kicker mono">[ from the makers ]</p>
+      <p class="i-body">Designed, printed, painted, and sealed by hand by Clay and
+      Kelsy &mdash; two artists in Los Angeles who make everything ourselves, from
+      our music to our instruments to these. The slight variations from piece to
+      piece are part of the charm; yours will be one of a kind.</p>
+    </div>
+    <div class="i-block">
+      <p class="i-kicker mono">[ shipping &amp; returns ]</p>
+      <p class="i-body">Ships worldwide from Los Angeles with tracking. Because each
+      one is made and painted by hand, we don&rsquo;t accept returns for a change of
+      mind &mdash; but if yours arrives damaged, message us and we&rsquo;ll always
+      replace or refund it.</p>
+    </div>
+  </section>
+
+  <section id="outro">
+    <span class="o-rule" aria-hidden="true"></span>
+    <p class="o-name">Polyphemus, The Cyclops</p>
+    <p class="o-num mono">$42.00</p>
+    <a class="cta cart-link mono" href="#" data-cart="">[ add to cart ]</a>
+  </section>
+
+</main>
+
+<a id="back" class="mono" href="https://clayandkelsy.com/design/" target="_top">[ &larr; the odyssey ]</a>
+<div id="brand">
+  <img src="../assets/ckd-logo.png" alt="CKD">
+  <span>clay &amp; kelsy designs</span>
+</div>
+
+<script type="module" src="app.js?v=1"></script>
+</body>
+</html>

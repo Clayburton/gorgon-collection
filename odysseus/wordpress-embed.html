@@ -1,0 +1,32 @@
+<!-- CKDesign — Odysseus, King of Ithaca (CK_016) · WordPress Custom HTML block.
+     Paste this WHOLE file into one Custom HTML block on the product page.
+
+     The iframe is FULL viewport height (100dvh) so it fills the screen and the
+     WordPress footer stays well below it — scrolling over the iframe scrolls the
+     page INSIDE it (smooth, no footer peek). Never use calc(100dvh - Npx): a
+     shorter iframe lets the site footer peek in under it. Phones grow the iframe
+     to the page's posted height (iOS forces iframes to fit their content). -->
+<style>
+  #ckd-odysseus{ width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); }
+  #ckd-odysseus iframe{ display:block; width:100%; height:100svh; height:100dvh; border:0; }
+</style>
+<div id="ckd-odysseus">
+  <iframe id="ckd-odysseus-frame"
+          src="https://clayburton.github.io/gorgon-collection/odysseus/"
+          title="Odysseus, King of Ithaca — CKDesign"
+          loading="lazy"
+          allow="fullscreen"></iframe>
+</div>
+<script>
+  (function () {
+    var frame = document.getElementById('ckd-odysseus-frame');
+    addEventListener('message', function (e) {
+      if (e.origin !== 'https://clayburton.github.io') return;
+      var d = e.data || {};
+      // the page only posts a height on phones (desktop stays silent); grow to fit
+      if (d.ckd === 'height' && typeof d.h === 'number' && d.h > 200 && d.h < 12000) {
+        frame.style.height = Math.round(d.h) + 'px';
+      }
+    });
+  })();
+</script>
