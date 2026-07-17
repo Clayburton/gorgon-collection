@@ -163,6 +163,11 @@ WP product page via its own `wordpress-embed.html`. Clone `baroque/` and swap:
   WooCommerce product exists, then the `?add-to-cart=` link), the copy in
   `index.html` (kicker `[ Gorgon Collection — CK_0NN ]` piece number, title,
   era line, paragraph, price), and the photos.
+- **Raw originals never ship.** The pipeline reads a `pictures*/` working
+  folder and writes only `<page>/photos/*.jpg` (~500K) + `photos.js`;
+  `.gitignore` excludes `pictures*/` so the full-res originals stay local.
+  If photos.js changes AFTER first deploy, version its import in app.js
+  (`import PHOTOS from './photos.js?v=N'`) so no stale manifest is cached.
 - **No photos yet?** Ship with an empty `photos.js` (`const PHOTOS=[]`)
   — app.js hides the whole `#gallery` section when it's empty, so the
   hero flows straight into `#info`. Drop a photos folder + run the
