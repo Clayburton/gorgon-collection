@@ -279,6 +279,13 @@ new ResizeObserver(() => { layout(); renderOnce(perfNow() * 0.001); }).observe(d
 
 function broadcastHeight() {
   if (window.parent === window) return;
+  /* DESKTOP: stay silent. The embed only grows the iframe when we post a
+     height; a grown iframe makes the PARENT page scroll through the frame,
+     and that cross-frame momentum handoff is the sticky two-finger scroll.
+     Viewport-sized iframe + internal scrolling = smooth — and staying quiet
+     here makes even the old (unguarded) embed block behave. Phones must
+     grow (iOS forces iframes to fit content). */
+  if (innerWidth > 700) return;
   try { parent.postMessage({ ckd: 'height', h: document.documentElement.scrollHeight }, '*'); } catch (_) {}
 }
 
