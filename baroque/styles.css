@@ -39,20 +39,19 @@ body{ min-height:100%; position:relative; }
 
 /* ============================ hero ============================ */
 
-/* heights are WIDTH-based (or px-capped): inside the self-growing WP iframe,
-   viewport units inflate as the iframe grows — svh-sized blocks feedback-loop
-   until the desktop page wears the phone layout */
+/* Hero height and piece size are BOTH svh-based so the piece fills the hero
+   instead of floating in it (the vw caps only bind on ultrawide-short screens).
+   Kept tight — hero ≈ piece + a little air — so the photo frames peek above the
+   fold. svh is honest because the desktop embed iframe stays viewport-sized and
+   scrolls internally (see wordpress-embed.html). */
 #hero{
   display:grid;
   grid-template-columns: 54% 46%;
   align-items:center;
-  /* 86svh, not 100: the [ photographs ] kicker + frame tops peek above the
-     fold. svh is honest here because the DESKTOP embed iframe stays
-     viewport-sized and scrolls internally (see wordpress-embed.html). */
-  min-height:min(86svh, 64vw);
-  padding:clamp(72px,6vw,116px) clamp(22px,4.2vw,56px) clamp(36px,3vw,64px);
+  min-height:min(68svh, 58vw);
+  padding:clamp(40px,4vw,72px) clamp(22px,4.2vw,56px) clamp(16px,1.8vw,30px);
 }
-#pieceSlot{ height:min(40vw, 620px); }
+#pieceSlot{ height:min(56svh, 44vw); }
 
 #copy{ max-width:520px; justify-self:start; padding-right:clamp(0px,2vw,28px); }
 #copy .kicker{
