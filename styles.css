@@ -25,11 +25,14 @@ body{ min-height:100%; overflow-x:hidden; }
   overflow:hidden;
 }
 
-/* minimal loading bar — thin, no text, fills as the masks download then fades */
+/* minimal loading bar — thin, no text, fills as the masks download then fades.
+   WHITE, not brand pink: this bar sits at top:0 of the canvas, so on /design/
+   the lower block's bar lands right on the seam between the two stacked blocks
+   — a pink line there looked wrong; white blends into both walls. */
 #loadbar{
   position:absolute; top:0; left:0;
   height:2px; width:0;
-  background:var(--pink);
+  background:#fff;
   z-index:6;
   opacity:.85;
   transition:width .3s ease, opacity .5s ease .25s;
