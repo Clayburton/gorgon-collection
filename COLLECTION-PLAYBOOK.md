@@ -220,6 +220,74 @@ When browser numbers look impossible, inspect the GLB file directly.
   bfcache `pageshow` self-reload handlers in the engine recover evicted
   rooms automatically — keep them.
 
+### Embed-block TEMPLATE for every new collection (copy verbatim, fill `SLUG`)
+
+Replace `SLUG` with the collection slug (e.g. `odyssey`) and `TITLE` with its
+name. Do NOT hand-write embed blocks from memory — generate from this.
+
+```html
+<!-- CKDesign — TITLE · WordPress Custom HTML block (below the first block). -->
+<style>
+  #ckd-SLUG{ width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); }
+  #ckd-SLUG iframe{ display:block; width:100%; height:100svh; height:100dvh; border:0; }
+</style>
+<div id="ckd-SLUG">
+  <iframe id="ckd-SLUG-frame"
+          src="https://clayburton.github.io/gorgon-collection/SLUG/"
+          title="TITLE — CKDesign"
+          loading="lazy"
+          allow="fullscreen"></iframe>
+</div>
+<script>
+  (function () {
+    var frame = document.getElementById('ckd-SLUG-frame');
+    addEventListener('message', function (e) {
+      if (e.origin !== 'https://clayburton.github.io') return;
+      var d = e.data || {};
+      if (d.ckdCol === 'SLUG' && typeof d.h === 'number' && d.h > 200 && d.h < 12000) {
+        frame.style.height = Math.round(d.h) + 'px';
+      }
+    });
+  })();
+</script>
+<script>
+  (function () {
+    if (window.__ckdFlash) return;
+    window.__ckdFlash = true;
+    var ov = document.createElement('div');
+    ov.setAttribute('aria-hidden', 'true');
+    ov.style.cssText =
+      'position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;' +
+      'z-index:2147483647;transition:opacity .32s ease;';
+    (document.body || document.documentElement).appendChild(ov);
+    function clearOv () {
+      ov.style.transition = 'none';
+      ov.style.opacity = '0';
+      ov.style.pointerEvents = 'none';
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { ov.style.transition = 'opacity .32s ease'; });
+      });
+    }
+    addEventListener('message', function (e) {
+      if (e.origin !== 'https://clayburton.github.io') return;
+      if (e.data && e.data.ckd === 'flash') {
+        ov.style.pointerEvents = 'auto';
+        ov.style.opacity = '1';
+      }
+    });
+    addEventListener('pageshow', clearOv);
+    ov.addEventListener('click', clearOv);
+  })();
+</script>
+```
+
+And the matching engine requirements for the new room's `app.js` (clone the
+odyssey room — it has all of these): `parent.postMessage({ckdCol:'SLUG',h})`
+for height, `parent.postMessage({ckd:'flash'})` in `navigate()`, the IO render
+pause with `rootMargin:'600px 0px'`, no entrance animation, importmap before
+modulepreloads, GLB `<link rel="preload" as="fetch" crossorigin>` hints, and
+the `pageshow`/context-loss self-heal handlers.
+
 ## Product pages (one per piece — `baroque/` is the reference instance)
 
 Each piece gets a subfolder page (`<repo>/<piece>/` on Pages), embedded on its
