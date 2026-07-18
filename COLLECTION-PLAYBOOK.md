@@ -202,19 +202,20 @@ When browser numbers look impossible, inspect the GLB file directly.
    (starts the mask downloads with the HTML; `crossorigin` makes it match
    GLTFLoader's fetch — verify single-fetch in the network log after any
    change). Keep the `?v=` in the preload URL in sync with `ASSET_V`.
-3. Render-loop hygiene, TWO levels of viewport culling:
-   - **Room level**: IntersectionObserver on the canvas pauses `tick()` when
-     the whole room is off-screen (`rootMargin:'600px 0px'` — wakes ~600px
-     before entering, sleeps 600px past; canvas holds its last frame while
-     asleep so nothing pops).
-   - **Mask level**: each mask has an invisible proxy div over its slot; a
-     second IntersectionObserver (`rootMargin:'800px 0px'`) sets
-     `r.onScreenMask`, and the render loop does `r.mesh.visible = r.onScreenMask`
-     so a mask scrolled off the screen skips its draw call. Event-driven (zero
-     per-frame cost). No-op on desktop (whole room = one screen); the win is the
-     tall mobile column and rooms with many masks. **The mask margin (800px)
-     MUST exceed the room margin (600px)** so a mask always un-culls before its
-     room starts rendering — otherwise the top mask pops in on the way back.
+3. Render-loop hygiene — ROOM-level culling ONLY:
+   - IntersectionObserver on the canvas pauses `tick()` when the whole room is
+     off-screen (`rootMargin:'600px 0px'` — wakes ~600px before entering,
+     sleeps 600px past; canvas holds its last frame while asleep so nothing
+     pops). Safe on Safari: the canvas spans the stage, so the observer always
+     intersects whenever any of the room shows.
+   - **Do NOT add per-mask culling via IntersectionObserver proxies.** Tried
+     2026-07-18 and reverted the same day: iPhone Safari's IO inside the
+     cross-origin /design/ iframes reported the mask proxies as off-screen
+     during the mobile iframe grow and never corrected — walls rendered, masks
+     stayed `mesh.visible=false` (page looked like it never loaded), Chrome
+     was fine. If a future many-mask room truly needs finer culling, it must
+     fail OPEN (masks visible unless a proxy has been seen `true` first) and be
+     verified on a real iPhone before shipping.
    - `pointer:coarse` cached in `layout()`.
 
 ## Stacking many collections on /design/ (future-proofing)
