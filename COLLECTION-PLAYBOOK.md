@@ -295,6 +295,24 @@ name. Do NOT hand-write embed blocks from memory — generate from this.
     });
     addEventListener('pageshow', clearOv);
     ov.addEventListener('click', clearOv);
+
+    // keep the page at the TOP while the collection blocks grow during load —
+    // on phones the growing iframes otherwise leave the page scrolled
+    // mid-collection. Disarms the instant the visitor touches/scrolls, and
+    // retires 6s after load, so it can never fight a real scroll.
+    var moved = false, t0 = Date.now();
+    ['touchstart', 'wheel', 'keydown', 'pointerdown'].forEach(function (ev) {
+      addEventListener(ev, function () { moved = true; }, { once: true, passive: true });
+    });
+    function pinTop () {
+      if (!moved && Date.now() - t0 < 6000 && scrollY > 0) scrollTo(0, 0);
+    }
+    addEventListener('message', function (e) {
+      if (e.origin !== 'https://clayburton.github.io') return;
+      var d = e.data || {};
+      if (d.ckd === 'height' || d.ckdCol) setTimeout(pinTop, 60);
+    });
+    addEventListener('load', function () { setTimeout(pinTop, 120); });
   })();
 </script>
 ```

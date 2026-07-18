@@ -309,15 +309,23 @@ Promise.all(COLLECTION.products.map((p) => new Promise((res, rej) =>
   // finish downloading (quicker, snappier; per Clay)
   renderOnce(perfNow() * 0.001);
   requestAnimationFrame(tick);
-  // measure the masthead (and thus the mobile column height) ONCE with the real
-  // web fonts — otherwise the fallback-font height posts first, then the font
-  // swap re-posts, and the seam jumps mid-load
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layout(); renderOnce(perfNow() * 0.001); });
 }).catch(err => { console.error('GLB load failed', err); showFallback(); });
 
 /* ============================= LAYOUT ============================= */
 let halfW = 1, halfH = 1, portrait = false, coarse = false;
 let lastGlW = 0, lastGlH = 0, lastPostedH = 0;
+
+/* fonts gate: the mobile column height depends on the masthead's RENDERED
+   height, so sizing/posting before the web fonts land guarantees a second,
+   visible resize when they swap in. Hold the portrait stage-height write and
+   the height post until fonts are ready — the column grows ONCE and settles.
+   Desktop is untouched (landscape never writes a stage height or posts). */
+let fontsReady = !(document.fonts && document.fonts.ready);
+if (!fontsReady) {
+  const arm = () => { if (!fontsReady) { fontsReady = true; layout(); renderOnce(performance.now() * 0.001); } };
+  document.fonts.ready.then(arm);
+  setTimeout(arm, 1500);        // never stall on a slow font CDN
+}
 function layout() {
   const w = stage.clientWidth || innerWidth || 1200;
   // width first — innerHeight lies inside iOS iframes (they expand to content),
@@ -335,14 +343,14 @@ function layout() {
     const mastBottom = (mast.offsetTop + mast.offsetHeight) || Math.round(w * 0.95);
     col.topPad = mastBottom + 48;
     const want = col.topPad + relics.length * (col.pieceH + col.placardH + col.gap) + 72;
-    if (Math.abs(stage.clientHeight - want) > 6) stage.style.height = want + 'px';
+    if (fontsReady && Math.abs(stage.clientHeight - want) > 6) stage.style.height = want + 'px';
   } else if (stage.style.height) {
     stage.style.height = '';
   }
   // let a WordPress embed grow its iframe to fit the column (only when it changes —
   // re-posting on every layout ping-pongs with the growing iframe)
   const postH = stage.clientHeight || innerHeight;
-  if (window.parent !== window && Math.abs(postH - lastPostedH) > 8) {
+  if (fontsReady && window.parent !== window && Math.abs(postH - lastPostedH) > 8) {
     lastPostedH = postH;
     try { parent.postMessage({ ckd: 'height', h: postH }, '*'); } catch (_) {}
   }
