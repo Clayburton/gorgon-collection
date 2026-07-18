@@ -203,7 +203,7 @@ body{ min-height:100%; overflow-x:hidden; }
 @media (max-aspect-ratio: 9/10){
   #masthead{
     max-width:min(86vw, 480px);
-    top:clamp(64px, 9vh, 100px);
+    top:clamp(88px, 26vw, 104px);   /* vw not vh: the mobile iframe GROWS, and a vh here shifted the masthead as it grew → resize loop */
     right:clamp(22px, 4.2vw, 56px);   /* stays right-aligned on phones too */
   }
   #masthead .tagline{ font-size:clamp(16px, 4.5vw, 19px); }

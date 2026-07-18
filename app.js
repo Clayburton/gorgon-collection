@@ -329,6 +329,10 @@ Promise.all(COLLECTION.products.map((p) => new Promise((res, rej) =>
   // finish downloading (quicker, snappier; per Clay)
   renderOnce(perfNow() * 0.001);
   requestAnimationFrame(tick);
+  // measure the masthead (and thus the mobile column height) ONCE with the real
+  // web fonts — otherwise the fallback-font height posts first, then the font
+  // swap re-posts, and the seam jumps mid-load
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layout(); renderOnce(perfNow() * 0.001); });
 }).catch(err => { console.error('GLB load failed', err); showFallback(); });
 
 /* ============================= LAYOUT ============================= */
@@ -358,7 +362,7 @@ function layout() {
   // let a WordPress embed grow its iframe to fit the column (only when it changes —
   // re-posting on every layout ping-pongs with the growing iframe)
   const postH = stage.clientHeight || innerHeight;
-  if (window.parent !== window && postH !== lastPostedH) {
+  if (window.parent !== window && Math.abs(postH - lastPostedH) > 8) {
     lastPostedH = postH;
     try { parent.postMessage({ ckd: 'height', h: postH }, '*'); } catch (_) {}
   }
