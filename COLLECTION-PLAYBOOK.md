@@ -196,7 +196,29 @@ When browser numbers look impossible, inspect the GLB file directly.
    GLTFLoader's fetch — verify single-fetch in the network log after any
    change). Keep the `?v=` in the preload URL in sync with `ASSET_V`.
 3. Render-loop hygiene: IntersectionObserver pauses `tick()` off-screen
-   (two rooms share /design/); `pointer:coarse` cached in `layout()`.
+   (many rooms share /design/) with `rootMargin: '600px 0px'` — a room wakes
+   ~600px BEFORE entering the viewport so its motion is already running when
+   seen, and sleeps 600px past; the canvas keeps its last painted frame while
+   asleep, so nothing ever visibly pops in/out. `pointer:coarse` cached in
+   `layout()`.
+
+## Stacking many collections on /design/ (future-proofing)
+
+- **Only the FIRST (top) block loads eagerly** — no `loading` attribute on
+  its iframe. **Every block below uses `loading="lazy"`**: it doesn't even
+  begin downloading until the visitor scrolls near it, so the page's initial
+  cost stays flat no matter how many collections stack up, and the top room
+  gets the whole connection first.
+- Each block's height postMessage uses its own key (`ckdCol:'<slug>'`) —
+  see above.
+- **The shared fade-to-white snippet goes in EVERY block, verbatim** (it's
+  idempotent — installs once). It MUST keep its `pageshow` reset: bfcache
+  restores the page with the overlay still white and the page reads as
+  "won't load". A click on a stuck overlay also dismisses it.
+- Off-screen rooms cost ~zero GPU (IO pause) but each holds a WebGL context;
+  browsers cap live contexts (~8–16). The `webglcontextlost/restored` +
+  bfcache `pageshow` self-reload handlers in the engine recover evicted
+  rooms automatically — keep them.
 
 ## Product pages (one per piece — `baroque/` is the reference instance)
 
