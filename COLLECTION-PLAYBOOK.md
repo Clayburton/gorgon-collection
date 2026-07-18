@@ -195,12 +195,20 @@ When browser numbers look impossible, inspect the GLB file directly.
    (starts the mask downloads with the HTML; `crossorigin` makes it match
    GLTFLoader's fetch — verify single-fetch in the network log after any
    change). Keep the `?v=` in the preload URL in sync with `ASSET_V`.
-3. Render-loop hygiene: IntersectionObserver pauses `tick()` off-screen
-   (many rooms share /design/) with `rootMargin: '600px 0px'` — a room wakes
-   ~600px BEFORE entering the viewport so its motion is already running when
-   seen, and sleeps 600px past; the canvas keeps its last painted frame while
-   asleep, so nothing ever visibly pops in/out. `pointer:coarse` cached in
-   `layout()`.
+3. Render-loop hygiene, TWO levels of viewport culling:
+   - **Room level**: IntersectionObserver on the canvas pauses `tick()` when
+     the whole room is off-screen (`rootMargin:'600px 0px'` — wakes ~600px
+     before entering, sleeps 600px past; canvas holds its last frame while
+     asleep so nothing pops).
+   - **Mask level**: each mask has an invisible proxy div over its slot; a
+     second IntersectionObserver (`rootMargin:'800px 0px'`) sets
+     `r.onScreenMask`, and the render loop does `r.mesh.visible = r.onScreenMask`
+     so a mask scrolled off the screen skips its draw call. Event-driven (zero
+     per-frame cost). No-op on desktop (whole room = one screen); the win is the
+     tall mobile column and rooms with many masks. **The mask margin (800px)
+     MUST exceed the room margin (600px)** so a mask always un-culls before its
+     room starts rendering — otherwise the top mask pops in on the way back.
+   - `pointer:coarse` cached in `layout()`.
 
 ## Stacking many collections on /design/ (future-proofing)
 
