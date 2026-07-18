@@ -235,6 +235,8 @@ name. Do NOT hand-write embed blocks from memory — generate from this.
 
 ```html
 <!-- CKDesign — TITLE · WordPress Custom HTML block (below the first block). -->
+<link rel="preconnect" href="https://clayburton.github.io" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <style>
   #ckd-SLUG{ width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); }
   #ckd-SLUG iframe{ display:block; width:100%; height:100svh; height:100dvh; border:0; }

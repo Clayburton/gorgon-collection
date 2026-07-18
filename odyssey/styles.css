@@ -23,6 +23,10 @@ body{ min-height:100%; overflow-x:hidden; }
   width:100%;
   height:100dvh;
   overflow:hidden;
+  /* instant wall: CSS twin of the procedural backdrop paints the moment the
+     HTML arrives — the canvas's first frame lands on a near-identical wall,
+     so the room never reads as a blank slab while three.js + GLBs load */
+  background:radial-gradient(120% 95% at 46% 34%, #dedad3 0%, #a8a49c 100%);
 }
 
 #gl{
