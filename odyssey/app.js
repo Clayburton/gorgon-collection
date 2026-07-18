@@ -298,35 +298,15 @@ Promise.all(COLLECTION.products.map((p) => new Promise((res, rej) =>
     label.addEventListener('pointerleave', () => { if (labelHold === i) labelHold = -1; });
     labelLayer.appendChild(label);
 
-    // invisible viewport-culling proxy: an IntersectionObserver watches it, and
-    // a mask whose slot has scrolled off the screen skips its draw call. Matters
-    // on the tall mobile column (many masks below the fold); on desktop the whole
-    // room is one screen so every proxy stays on screen and nothing is culled.
-    const proxy = document.createElement('div');
-    proxy.style.cssText = 'position:absolute;inset:0;pointer-events:none;';
-    stage.appendChild(proxy);
-
     relics.push({
-      slot, spin, mesh, mat, prod, label, halfHgt, proxy,
+      slot, spin, mesh, mat, prod, label, halfHgt,
       home: new THREE.Vector3(), pos: new THREE.Vector3(),
       baseTilt: { x: spin.rotation.x, y: spin.rotation.y },
       sBase: 1, sCur: 1, hover: 0, dim: 0,
       phase: Math.random() * Math.PI * 2,
-      labelBelow: true, onScreenMask: true,
+      labelBelow: true,
     });
   });
-
-  // one observer culls off-screen masks (watches the proxies above) — fires only
-  // on scroll, zero per-frame cost. Its 800px margin is WIDER than the room's
-  // 600px wake margin, so a mask is always un-culled BEFORE its room starts
-  // rendering again — nothing ever pops in.
-  if ('IntersectionObserver' in window) {
-    const byProxy = new Map(relics.map(r => [r.proxy, r]));
-    const cullIO = new IntersectionObserver((entries) => {
-      for (const e of entries) { const r = byProxy.get(e.target); if (r) r.onScreenMask = e.isIntersecting; }
-    }, { rootMargin: '800px 0px' });
-    relics.forEach(r => cullIO.observe(r.proxy));
-  }
 
   layout();
   renderer.compile(scene, camera);
@@ -397,14 +377,11 @@ function layout() {
       const cyPx = col.topPad + i * (col.pieceH + col.placardH + col.gap) + col.pieceH / 2;
       r.home.set((i % 2 ? 0.045 : -0.045) * halfW, halfH - cyPx * pxToWorld, 0);
       r.sBase = col.pieceH * pxToWorld;              // geometry max-dim 1 ⇒ ≈pieceH px
-      if (r.proxy) r.proxy.style.cssText =           // cull proxy tracks this mask's slice of the column
-        `position:absolute;left:0;width:100%;pointer-events:none;top:${(cyPx - col.pieceH / 2).toFixed(0)}px;height:${col.pieceH}px;`;
     } else {
       const sl = COLLECTION.scatterL[i % COLLECTION.scatterL.length];
       const yTop = halfH * (1 - P.topClear * 2);      // menu-bar headroom
       r.home.set(sl.x * halfW * P.spreadX, Math.min(sl.y * halfH * P.spreadY, yTop), sl.z);
       r.sBase = sl.s * P.objScale * Math.min(halfW, halfH);
-      if (r.proxy) { r.proxy.style.cssText = 'position:absolute;inset:0;pointer-events:none;'; r.onScreenMask = true; }
     }
     r.pos.copy(r.home);
     r.slot.position.copy(r.home);
@@ -544,7 +521,6 @@ function step(t, dt) {
               : selected;
 
   relics.forEach((r, i) => {
-    r.mesh.visible = r.onScreenMask;   // off-screen masks skip their draw call (see the cull proxy)
     const kh = 1 - Math.exp(-P.hover.lambda * dt);
     const kd = 1 - Math.exp(-P.dim.lambda * dt);
 
