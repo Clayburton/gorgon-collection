@@ -2,7 +2,12 @@
      Paste this WHOLE file into one Custom HTML block, DIRECTLY BELOW the
      Gorgon Collection block on /design/. The iframe grows to fit the
      collection column on phones (the page posts its height up as ckdCol —
-     a distinct key so the two collection iframes never resize each other). -->
+     a distinct key so the two collection iframes never resize each other).
+
+     LOWER collection block: keeps loading="lazy" so it doesn't even start
+     downloading until the visitor scrolls near it — the top block gets the
+     whole connection first. Every future collection block added below also
+     uses loading="lazy" (only the FIRST block on the page loads eagerly). -->
 <style>
   #ckd-odyssey{ width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw); }
   #ckd-odyssey iframe{ display:block; width:100%; height:100svh; height:100dvh; border:0; }
@@ -33,6 +38,9 @@
      below), listens for {ckd:'flash'} from any CKD iframe, and fades
      the WHOLE viewport white — so clicking an object in one block
      fades every other block (and any peeking sliver) with it.
+     The pageshow reset is REQUIRED: the browser's back button restores
+     this page from cache exactly as it was left — overlay still white —
+     so without the reset the page comes back as a stuck white sheet.
      Pure CSS opacity, GPU-composited, zero JS per frame — no lag.
      ============================================================ -->
 <script>
@@ -45,6 +53,14 @@
       'position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;' +
       'z-index:2147483647;transition:opacity .32s ease;';
     (document.body || document.documentElement).appendChild(ov);
+    function clearOv () {
+      ov.style.transition = 'none';             // snap clear — no fade on the way back
+      ov.style.opacity = '0';
+      ov.style.pointerEvents = 'none';
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { ov.style.transition = 'opacity .32s ease'; });
+      });
+    }
     addEventListener('message', function (e) {
       if (e.origin !== 'https://clayburton.github.io') return;
       if (e.data && e.data.ckd === 'flash') {
@@ -52,5 +68,9 @@
         ov.style.opacity = '1';
       }
     });
+    // back/forward restores the page WITH the overlay still white — always clear it
+    addEventListener('pageshow', clearOv);
+    // safety valve: if the overlay is ever stuck, a click/tap dismisses it
+    ov.addEventListener('click', clearOv);
   })();
 </script>

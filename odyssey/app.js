@@ -596,7 +596,11 @@ if ('IntersectionObserver' in window) {
     const vis = entries[entries.length - 1].isIntersecting;
     if (vis && !onScreen) { last = perfNow(); renderOnce(perfNow() * 0.001); }
     onScreen = vis;
-  }).observe(canvas);
+    /* rootMargin: wake 600px BEFORE the room scrolls into view (motion is
+       already running by the time you see it — no visible "pop back to life")
+       and sleep only once it's 600px past. While asleep the canvas keeps its
+       last painted frame, so the user never sees anything load in. */
+  }, { rootMargin: '600px 0px' }).observe(canvas);
 }
 
 function tick() {
