@@ -52,6 +52,13 @@ look, behave, and get built. Read it top to bottom before building the next one.
   auto-resizing parent iframe feedback-loops) and never from viewport
   fractions (that's what caused v0.2's dead top band + cut-off last piece).
   The page posts its height to the WP embed, which grows the iframe.
+  **Corollary — NO `vh`/`dvh`/`svh` anywhere in the CSS that feeds the posted
+  height** (masthead `top`, etc.): the mobile iframe GROWS as the parent
+  applies the posted height, so any viewport-height unit shifts as it grows →
+  re-post → re-grow → the seam "hyper-resizes" during load. Use `vw`/fixed.
+  Post only on a real delta (`Math.abs(postH-lastPostedH) > 8`) and re-measure
+  once on `document.fonts.ready` (fallback-font masthead height posts first,
+  else the font swap re-posts and the seam jumps).
 - **Portrait detection is WIDTH-FIRST** (`w < 700 || aspect < 0.9`) —
   `innerHeight` lies inside iOS iframes (they expand to content), so a phone
   can read as "landscape" by aspect alone and get the desktop scatter. Width
