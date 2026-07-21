@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6eef1">
+<title>CKDesign — The Eleusinian Mysteries</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏺</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=EB+Garamond:wght@400;500&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=1">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<!-- THE IMPORT MAP MUST COME BEFORE ANY modulepreload. From cache
+     (back/refresh) the preloads register instantly, the map arrives "too
+     late", bare 'three' fails to resolve and the whole module dies silently —
+     that was the blank-masks-on-back bug. -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+  }
+}
+</script>
+<!-- flatten the module waterfall: fetch three + the addons alongside app.js
+     instead of one hop after it -->
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/loaders/GLTFLoader.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/libs/meshopt_decoder.module.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/environments/RoomEnvironment.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/postprocessing/EffectComposer.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/postprocessing/RenderPass.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/postprocessing/ShaderPass.js">
+<!-- start the model downloads with the HTML instead of after the JS chain -->
+<link rel="preload" as="fetch" crossorigin fetchpriority="high" href="../assets/grain.glb?v=1">
+<link rel="preload" as="fetch" crossorigin fetchpriority="high" href="../assets/poppy.glb?v=1">
+<link rel="preload" as="fetch" crossorigin fetchpriority="high" href="../assets/vessel.glb?v=1">
+</head>
+<body>
+
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <div id="labelLayer" aria-hidden="true"></div>
+
+  <header id="masthead">
+    <h1 class="title">The Eleusinian<br>Mysteries</h1>
+    <p class="tagline">For two thousand years people of the ancient world walked to
+    Eleusis, and whatever took place there was sacred enough that no initiate ever
+    revealed the secret. What we have are the symbols left behind &mdash; grain,
+    sleep, and the offering.</p>
+    <p class="note">3D printed &amp; painted by hand.</p>
+  </header>
+
+  <p id="hint" class="mono">[ click each object to find out more ]</p>
+
+  <div id="brand">
+    <img src="../assets/ckd-logo.png" alt="CKD">
+    <span>clay &amp; kelsy designs</span>
+  </div>
+
+  <div id="fallback" hidden>
+    <h1 class="title">The Eleusinian Mysteries</h1>
+    <ul id="fallbackList"></ul>
+  </div>
+
+  <div id="flash" aria-hidden="true"></div>
+</div>
+
+<script type="module" src="app.js?v=1"></script>
+</body>
+</html>
