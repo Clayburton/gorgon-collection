@@ -47,9 +47,9 @@ const COLLECTION = {
      baseline (y), evenly spaced (x ±0.55). Poppy is square where Grain/Vessel
      are tall, so it reads a touch larger at equal s — trimmed to match. */
   scatterL: [
-    { x:-0.42, y:-0.13, z:0, s:0.92 },   // Grain (Wheat Sheaf) — left (clears the title column)
-    { x: 0.09, y:-0.13, z:0, s:0.82 },   // Poppy — center (square → smaller s to match)
-    { x: 0.60, y:-0.13, z:0, s:0.92 },   // Sacred Vessel — right
+    { x:-0.55, y:-0.36, z:0, s:0.88 },   // Grain (Wheat Sheaf) — left
+    { x: 0.00, y:-0.36, z:0, s:0.78 },   // Poppy — center (square → smaller s to match)
+    { x: 0.55, y:-0.36, z:0, s:0.88 },   // Sacred Vessel — right
   ],
 };
 
@@ -333,7 +333,10 @@ function layout() {
   // width first — innerHeight lies inside iOS iframes (they expand to content),
   // so a phone can read as "landscape" by aspect; aspect still catches narrow
   // desktop windows and portrait tablets
-  portrait = w > 0 && (w < 700 || (w / Math.max(innerHeight, 1)) < 0.9);
+  // this room is a horizontal ROW under a top-LEFT title, so a near-square
+  // window can't fit the row beside the tall paragraph — fall to the stacked
+  // column earlier (aspect < 1.2) so it's clean instead of cramped
+  portrait = w > 0 && (w < 700 || (w / Math.max(innerHeight, 1)) < 1.2);
 
   /* portrait: pixel-measured column — masthead height + N × (piece + placard).
      Width/content-driven only (never innerHeight), so the stage is exactly as
