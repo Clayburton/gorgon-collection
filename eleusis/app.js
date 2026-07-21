@@ -18,9 +18,9 @@ const COLLECTION = {
   /* a PERFECT ROW of three, left → right: Grain · Poppy · Sacred Vessel —
      the symbols left behind. Masthead sits top-LEFT (like the Gorgons). */
   products: [
-    { id:'grain',  name:'Wheat Sheaf',   date:'1st c. BCE',
+    { id:'grain',  name:'Wheat Sheaf',   date:'1st c. BCE', flip:true,
       url:'https://clayandkelsy.com/eleusis-grain/', file:'../assets/grain.glb' },
-    { id:'poppy',  name:'Poppy',         date:'1st c. BCE',
+    { id:'poppy',  name:'Poppy',         date:'1st c. BCE', flip:true,
       url:'https://clayandkelsy.com/eleusis-poppy/', file:'../assets/poppy.glb' },
     { id:'vessel', name:'Sacred Vessel', date:'1st c. BCE',
       url:'https://clayandkelsy.com/eleusis-sacred-vessel/', file:'../assets/vessel.glb' },
@@ -47,9 +47,9 @@ const COLLECTION = {
      baseline (y), evenly spaced (x ±0.55). Poppy is square where Grain/Vessel
      are tall, so it reads a touch larger at equal s — trimmed to match. */
   scatterL: [
-    { x:-0.55, y:-0.36, z:0, s:0.88 },   // Grain (Wheat Sheaf) — left
-    { x: 0.00, y:-0.36, z:0, s:0.78 },   // Poppy — center (square → smaller s to match)
-    { x: 0.55, y:-0.36, z:0, s:0.88 },   // Sacred Vessel — right
+    { x:-0.22, y: 0.00, z:0, s:0.86 },   // Grain (Wheat Sheaf) — left of the row, clear of the title
+    { x: 0.38, y: 0.00, z:0, s:0.76 },   // Poppy — center (square → smaller s to match)
+    { x: 0.98, y: 0.00, z:0, s:0.86 },   // Sacred Vessel — right
   ],
 };
 
@@ -259,6 +259,9 @@ Promise.all(COLLECTION.products.map((p) => new Promise((res, rej) =>
     gltf.scene.updateMatrixWorld(true);
     gltf.scene.traverse(o => { if (o.isMesh && !src) src = o; });
     const geo = src.geometry.clone().applyMatrix4(src.matrixWorld);
+    // some scans come in upside-down (top points down) — spin 180° about the
+    // relief-normal (Y) axis so the piece reads right-side-up on screen
+    if (prod.flip) geo.rotateY(Math.PI);
     geo.computeBoundingSphere();
     geo.computeBoundingBox();
     // on-screen height = object-space Z extent (the face rotation maps z → vertical);
@@ -333,10 +336,10 @@ function layout() {
   // width first — innerHeight lies inside iOS iframes (they expand to content),
   // so a phone can read as "landscape" by aspect; aspect still catches narrow
   // desktop windows and portrait tablets
-  // this room is a horizontal ROW under a top-LEFT title, so a near-square
-  // window can't fit the row beside the tall paragraph — fall to the stacked
-  // column earlier (aspect < 1.2) so it's clean instead of cramped
-  portrait = w > 0 && (w < 700 || (w / Math.max(innerHeight, 1)) < 1.2);
+  // this room is a horizontal ROW beside a top-LEFT title, so it needs real
+  // width — fall to the stacked column when the box isn't wide enough
+  // (aspect < 1.35) so it's clean instead of cramped
+  portrait = w > 0 && (w < 700 || (w / Math.max(innerHeight, 1)) < 1.5);
 
   /* portrait: pixel-measured column — masthead height + N × (piece + placard).
      Width/content-driven only (never innerHeight), so the stage is exactly as
