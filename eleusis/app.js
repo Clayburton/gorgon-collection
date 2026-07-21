@@ -22,7 +22,7 @@ const COLLECTION = {
       url:'https://clayandkelsy.com/eleusis-grain/', file:'../assets/grain.glb' },
     { id:'poppy',  name:'Poppy',         date:'1st c. BCE', flip:true,
       url:'https://clayandkelsy.com/eleusis-poppy/', file:'../assets/poppy.glb' },
-    { id:'vessel', name:'Sacred Vessel', date:'1st c. BCE',
+    { id:'vessel', name:'Sacred Vessel', date:'1st c. BCE', flip:true,
       url:'https://clayandkelsy.com/eleusis-sacred-vessel/', file:'../assets/vessel.glb' },
   ],
   /* a VERY SLIGHT pink wall — sacred, initiatory, softer than the other two
@@ -47,9 +47,9 @@ const COLLECTION = {
      baseline (y), evenly spaced (x ±0.55). Poppy is square where Grain/Vessel
      are tall, so it reads a touch larger at equal s — trimmed to match. */
   scatterL: [
-    { x:-0.22, y: 0.00, z:0, s:0.86 },   // Grain (Wheat Sheaf) — left of the row, clear of the title
-    { x: 0.38, y: 0.00, z:0, s:0.76 },   // Poppy — center (square → smaller s to match)
-    { x: 0.98, y: 0.00, z:0, s:0.86 },   // Sacred Vessel — right
+    { x:-0.40, y: 0.00, z:0, s:1.00 },   // Grain (Wheat Sheaf) — left of the row, clear of the title
+    { x: 0.20, y: 0.00, z:0, s:0.90 },   // Poppy — center (square → smaller s to match)
+    { x: 0.80, y: 0.00, z:0, s:1.00 },   // Sacred Vessel — right
   ],
 };
 
@@ -339,7 +339,7 @@ function layout() {
   // this room is a horizontal ROW beside a top-LEFT title, so it needs real
   // width — fall to the stacked column when the box isn't wide enough
   // (aspect < 1.35) so it's clean instead of cramped
-  portrait = w > 0 && (w < 700 || (w / Math.max(innerHeight, 1)) < 1.5);
+  portrait = w > 0 && (w < 700 || (w / Math.max(innerHeight, 1)) < 1.9);
 
   /* portrait: pixel-measured column — masthead height + N × (piece + placard).
      Width/content-driven only (never innerHeight), so the stage is exactly as
