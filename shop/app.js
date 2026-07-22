@@ -23,7 +23,7 @@ const ASSET_V = 1;
 
 const P = {
   fov: 24, camDist: 10,
-  objScale: 0.74,
+  objScale: 0.84,
   spreadX: 0.80, spreadY: 0.74,
   /* landscape: a row on the RIGHT, beside the type block */
   rowL: [
@@ -43,8 +43,11 @@ const P = {
   hover:  { scale: 1.05, lambda: 5 },     // whole-banner hover presents all three
   light:  { key: 1.42, fill: 0.5, rim: 1.05, env: 0.5, exposure: 1.0 },
   grade:  { grain: 0.024, vignette: 0.12, contrast: 1.04, centerLight: 0.045 },
-  backdrop: { center:'#f6f2ea', edge:'#e3dccd', vein:'#b9b0a0', veinAmount:0.16,
-              grain:9, seed:7, lightX:0.5, lightY:0.34 },
+  /* a deeper, warmer tan than the collection rooms — the pale stone reads
+     richer against it, and the marble drift + grain are dialled up so the wall
+     has real material detail instead of flat colour */
+  backdrop: { center:'#efe5d3', edge:'#d4c6ac', vein:'#ab9b7e', veinAmount:0.26,
+              grain:12, seed:7, lightX:0.5, lightY:0.34 },
   finish: { base:0xefede7, washGamma:1.1, rough:0.62, roughWashGloss:0.16,
             roughVar:0.10, clearcoat:0.06, sheen:0.22, sheenColor:0xf2ede2,
             veinAmount:0.10, veinScale:2.6, env:0.5, hoverTint:0xfff3e4 },

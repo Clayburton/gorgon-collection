@@ -1,5 +1,5 @@
 :root{
-  --paper:#f6f2ea;
+  --paper:#efe5d3;
   --ink:#26202c;
   --muted:#6f6479;
   --pink:#cc5f97;
@@ -28,7 +28,7 @@ html,body{
   cursor:pointer;
   /* instant wall: a CSS twin of the procedural gallery wall paints the moment
      the HTML lands, so the banner reads finished before three.js arrives */
-  background:radial-gradient(120% 100% at 50% 34%, #f6f2ea 0%, #e3dccd 100%);
+  background:radial-gradient(120% 100% at 50% 34%, #efe5d3 0%, #d4c6ac 100%);
 }
 
 #gl{
