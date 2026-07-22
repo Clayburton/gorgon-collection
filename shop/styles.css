@@ -62,9 +62,10 @@ html,body{
   margin-top:.6em;
   font-family:'Cormorant Garamond', Georgia, serif;
   font-weight:500;
-  font-size:clamp(34px, 5.6vmin, 66px);
-  line-height:1.02;
+  font-size:clamp(24px, 2.4vw, 38px);
+  line-height:1.06;
   letter-spacing:.01em;
+  white-space:nowrap;            /* one line, always */
 }
 
 .blurb{
@@ -143,7 +144,7 @@ html,body{
     text-align:center;
   }
   .kicker{ font-size:9.5px; letter-spacing:.16em; }
-  .title{ margin-top:.4em; font-size:clamp(27px, 7.2vw, 40px); }
+  .title{ margin-top:.4em; font-size:clamp(19px, 6.2vw, 34px); }
   .blurb{
     margin:.7em auto 0;
     font-size:clamp(13px, 3.4vw, 15.5px);
