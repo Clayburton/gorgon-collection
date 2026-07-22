@@ -1,0 +1,160 @@
+:root{
+  --paper:#f6f2ea;
+  --ink:#26202c;
+  --muted:#6f6479;
+  --pink:#cc5f97;
+  --hair:rgba(38,32,44,.16);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+html,body{
+  height:100%;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Courier Prime', ui-monospace, monospace;
+  overflow:hidden;                 /* fixed-height banner — never scrolls */
+}
+
+/* the banner is one big link: click anywhere to enter the shop */
+#stage{
+  position:relative;
+  display:block;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  text-decoration:none;
+  color:inherit;
+  cursor:pointer;
+  /* instant wall: a CSS twin of the procedural gallery wall paints the moment
+     the HTML lands, so the banner reads finished before three.js arrives */
+  background:radial-gradient(120% 100% at 50% 34%, #f6f2ea 0%, #e3dccd 100%);
+}
+
+#gl{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  display:block;
+}
+
+.mono{ font-family:'Courier Prime', ui-monospace, monospace; }
+
+/* ---------------- the type ---------------- */
+
+#copy{
+  position:absolute;
+  left:clamp(24px, 6vw, 92px);
+  top:50%;
+  transform:translateY(-50%);
+  z-index:3;
+  max-width:min(46vw, 520px);
+  pointer-events:none;             /* the whole stage is the link */
+}
+
+.kicker{
+  font-size:clamp(9.5px, 1.15vmin, 11.5px);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.title{
+  margin-top:.6em;
+  font-family:'Cormorant Garamond', Georgia, serif;
+  font-weight:500;
+  font-size:clamp(34px, 5.6vmin, 66px);
+  line-height:1.02;
+  letter-spacing:.01em;
+}
+
+.blurb{
+  margin-top:1.05em;
+  font-family:'EB Garamond', Georgia, serif;
+  font-weight:500;
+  font-size:clamp(15px, 1.95vmin, 19.5px);
+  line-height:1.62;
+  opacity:.86;
+  max-width:40ch;
+}
+
+/* CTA reads as a real button but stays part of the one big link */
+.cta{
+  display:inline-flex;
+  align-items:center;
+  margin-top:1.5em;
+  padding:.85em 1.4em;
+  background:var(--ink);
+  border:1px solid var(--ink);
+  border-radius:9px;
+  color:#f4f0e8;
+  font-size:clamp(11px, 1.4vmin, 13px);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  box-shadow:0 12px 30px rgba(38,32,44,.18), 0 2px 6px rgba(38,32,44,.08);
+  transition:background .3s ease, border-color .3s ease, transform .3s ease, box-shadow .3s ease;
+}
+#stage:hover .cta,
+#stage:focus-visible .cta{
+  background:var(--pink);
+  border-color:var(--pink);
+  transform:translateY(-1px);
+  box-shadow:0 16px 38px rgba(38,32,44,.22), 0 2px 6px rgba(38,32,44,.10);
+}
+#stage:focus-visible{ outline:2px solid var(--pink); outline-offset:-4px; }
+
+/* ---------------- brand corner ---------------- */
+
+#brand{
+  position:absolute;
+  right:clamp(20px, 3.4vw, 44px);
+  bottom:clamp(14px, 2.6vh, 26px);
+  z-index:3; pointer-events:none;
+  opacity:.75;
+}
+#brand img{
+  width:clamp(40px, 4.6vmin, 58px);
+  height:auto;
+  mix-blend-mode:multiply;      /* line art sits on the paper, no white box */
+}
+
+/* ---------------- white flash on click ---------------- */
+
+#flash{
+  position:absolute; inset:0;
+  background:#fff;
+  opacity:0; pointer-events:none;
+  z-index:9;
+  transition:opacity .32s ease;
+}
+#flash.go{ opacity:1; }
+
+/* ---------------- narrow / phone ---------------- */
+/* type moves to the top, the relics sit in a row beneath it (app.js mirrors
+   this with its own portrait layout) */
+@media (max-aspect-ratio: 5/4), (max-width: 700px){
+  /* relics ride across the top (app.js rowP), copy anchors to the bottom so the
+     button can never land on top of a piece */
+  #copy{
+    top:auto;
+    bottom:clamp(16px, 4vh, 40px);
+    left:50%;
+    transform:translateX(-50%);
+    max-width:min(90vw, 460px);
+    text-align:center;
+  }
+  .kicker{ font-size:9.5px; letter-spacing:.16em; }
+  .title{ margin-top:.4em; font-size:clamp(27px, 7.2vw, 40px); }
+  .blurb{
+    margin:.7em auto 0;
+    font-size:clamp(13px, 3.4vw, 15.5px);
+    line-height:1.5;
+    max-width:33ch;
+  }
+  .cta{ margin-top:1em; padding:.72em 1.15em; letter-spacing:.14em; }
+  #brand{ display:none; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .cta{ transition:none; }
+  #flash{ transition:opacity .1s linear; }
+}

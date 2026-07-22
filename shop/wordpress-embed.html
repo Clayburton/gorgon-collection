@@ -1,0 +1,58 @@
+<!-- ============================================================
+     CKDesign — "Shop Clay & Kelsy Designs" banner
+     Paste this WHOLE file into one Custom HTML block on the HOME page,
+     wherever the banner should sit (e.g. under the "experience i am" strip).
+
+     NOT full-page: a fixed-height strip, like the experience-i-am banner.
+     Loads fast — the three relics are hard-simplified (~275KB total), the
+     gallery wall is procedural (nothing downloaded), and the render loop
+     sleeps whenever the banner is scrolled off screen.
+
+     The whole banner is one link to /design/.
+     ============================================================ -->
+<div style="position:relative;width:100vw;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;height:clamp(460px,58vh,620px);background:#f6f2ea;overflow:hidden;">
+  <iframe
+    src="https://clayburton.github.io/gorgon-collection/shop/"
+    title="Shop Clay &amp; Kelsy Designs"
+    loading="lazy"
+    style="position:absolute;inset:0;width:100%;height:100%;border:0;display:block;">
+  </iframe>
+</div>
+
+<!-- ============================================================
+     SHARED CKD FADE-TO-WHITE — the banner posts {ckd:'flash'} when it's
+     clicked, and this fades the WHOLE page white before the shop opens.
+     Installs once (guard below), so it's safe to have in more than one
+     CKD block on the same page. The pageshow reset is REQUIRED: the back
+     button restores the page exactly as it was left — overlay still white
+     — and without the reset it comes back as a stuck white sheet.
+     ============================================================ -->
+<script>
+  (function () {
+    if (window.__ckdFlash) return;              // install once per page
+    window.__ckdFlash = true;
+    var ov = document.createElement('div');
+    ov.setAttribute('aria-hidden', 'true');
+    ov.style.cssText =
+      'position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;' +
+      'z-index:2147483647;transition:opacity .32s ease;';
+    (document.body || document.documentElement).appendChild(ov);
+    function clearOv () {
+      ov.style.transition = 'none';             // snap clear — no fade on the way back
+      ov.style.opacity = '0';
+      ov.style.pointerEvents = 'none';
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { ov.style.transition = 'opacity .32s ease'; });
+      });
+    }
+    addEventListener('message', function (e) {
+      if (e.origin !== 'https://clayburton.github.io') return;
+      if (e.data && e.data.ckd === 'flash') {
+        ov.style.pointerEvents = 'auto';
+        ov.style.opacity = '1';
+      }
+    });
+    addEventListener('pageshow', clearOv);
+    ov.addEventListener('click', clearOv);      // safety valve if it ever sticks
+  })();
+</script>
