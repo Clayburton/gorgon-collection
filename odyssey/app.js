@@ -17,13 +17,13 @@ const COLLECTION = {
   title: 'The Odyssey',
   products: [
     { id:'odysseus', name:'Odysseus, King of Ithaca', date:'Homer’s Odyssey',
-      url:'https://clayandkelsy.com/odyssey-odysseus-king-of-ithaca/', file:'../assets/odysseus.glb' },
+      url:'https://clayandkelsy.com/odysseus-king-of-ithaca/', file:'../assets/odysseus.glb' },
     { id:'athena',   name:'Athena / Minerva',         date:'1st–2nd century AD',
-      url:'https://clayandkelsy.com/odyssey-athena-minerva/', file:'../assets/athena.glb' },
+      url:'https://clayandkelsy.com/athena-minerva/', file:'../assets/athena.glb' },
     { id:'cyclops',  name:'Polyphemus, The Cyclops',  date:'2nd century',
-      url:'https://clayandkelsy.com/odyssey-polyphemus-the-cyclops/', file:'../assets/cyclops.glb' },
+      url:'https://clayandkelsy.com/polyphemus-the-cyclops/', file:'../assets/cyclops.glb' },
     { id:'shepherd', name:'Polyphemus, The Shepherd', date:'2nd century',
-      url:'https://clayandkelsy.com/odyssey-polyphemus-the-shepherd/', file:'../assets/shepherd.glb' },
+      url:'https://clayandkelsy.com/polyphemus-the-shepherd/', file:'../assets/shepherd.glb' },
   ],
   /* cave wall: cool stone grays (the Gorgon room is warm paper — this one is
      Polyphemus's cave), moodier veins, soft light pulled a little off-center */

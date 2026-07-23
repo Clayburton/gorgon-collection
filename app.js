@@ -20,7 +20,7 @@ const COLLECTION = {
     { id:'baroque',  name:'Medusa Baroque Europe', date:'17th Century',
       url:'https://clayandkelsy.com/medusa-baroque-europe/', file:'assets/baroque.glb' },
     { id:'winged',   name:'Winged Medusa Egypt',   date:'332–250 BCE',
-      url:'https://clayandkelsy.com/medusa-wing-egypt/', file:'assets/winged.glb',
+      url:'https://clayandkelsy.com/medusa-winged-egypt/', file:'assets/winged.glb',
       hoverScale: 1.17 },   // wide plaque, small face — meets the others at full hover
     { id:'southern', name:'Medusa Southern Italy', date:'500 BCE',
       url:'https://clayandkelsy.com/medusa-southern-italy/', file:'assets/southern.glb' },
