@@ -277,17 +277,24 @@ new IntersectionObserver((entries) => {
 
 addEventListener('resize', layout);
 new ResizeObserver(() => { layout(); renderOnce(perfNow() * 0.001); }).observe(document.body);
+// re-measure once web fonts land (they change text-block heights → page height)
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => layout());
 
+let lastPostedH = 0;
 function broadcastHeight() {
   if (window.parent === window) return;
-  /* DESKTOP: stay silent. The embed only grows the iframe when we post a
-     height; a grown iframe makes the PARENT page scroll through the frame,
-     and that cross-frame momentum handoff is the sticky two-finger scroll.
-     Viewport-sized iframe + internal scrolling = smooth — and staying quiet
-     here makes even the old (unguarded) embed block behave. Phones must
-     grow (iOS forces iframes to fit content). */
-  if (innerWidth > 700) return;
-  try { parent.postMessage({ ckd: 'height', h: document.documentElement.scrollHeight }, '*'); } catch (_) {}
+  /* Grow the iframe to the full page height on EVERY size (phones AND desktop)
+     so the WordPress page is the ONLY scroll container. A viewport-height iframe
+     with the tall page scrolling INSIDE it nests two scroll containers, and the
+     two-finger momentum handoff between them sticks — and strands the footer on
+     screen. One tall iframe + the parent scrolling everything is smooth, exactly
+     like /design/. Post only on a real change so it can never jitter. (This is
+     why the hero + #pieceSlot heights are vw-based, not svh: a viewport-HEIGHT
+     unit inside a growing iframe feeds back on its own height.) */
+  const h = document.documentElement.scrollHeight;
+  if (Math.abs(h - lastPostedH) <= 8) return;
+  lastPostedH = h;
+  try { parent.postMessage({ ckd: 'height', h }, '*'); } catch (_) {}
 }
 
 /* ============================= INPUT ============================= */
