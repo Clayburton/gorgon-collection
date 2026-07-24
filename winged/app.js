@@ -281,6 +281,21 @@ new ResizeObserver(() => { layout(); renderOnce(perfNow() * 0.001); }).observe(d
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => layout());
 
 let lastPostedH = 0;
+let scrollLocked = false;
+/* Once the parent has grown the iframe to fit, turn OFF the iframe's own scroll
+   so the WordPress page is the SOLE scroll container. The grow leaves the iframe
+   at the FLOORED content height, so a fraction of a pixel of internal overflow
+   remains — and macOS intermittently LATCHES the two-finger gesture to that
+   hair of scroll, rubber-bands ("starts to move, springs back"), and only the
+   NEXT gesture reaches the parent. overflow:hidden clips that sub-pixel away so
+   there is nothing to latch onto: every wheel/swipe chains straight to the
+   parent. Only when framed — a direct github.io visit must still scroll. */
+function lockInnerScroll() {
+  if (scrollLocked || window.parent === window) return;
+  scrollLocked = true;
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+}
 function broadcastHeight() {
   if (window.parent === window) return;
   /* Grow the iframe to the full page height on EVERY size (phones AND desktop)
@@ -290,11 +305,16 @@ function broadcastHeight() {
      screen. One tall iframe + the parent scrolling everything is smooth, exactly
      like /design/. Post only on a real change so it can never jitter. (This is
      why the hero + #pieceSlot heights are vw-based, not svh: a viewport-HEIGHT
-     unit inside a growing iframe feeds back on its own height.) */
+     unit inside a growing iframe feeds back on its own height.) scrollHeight is
+     reported in full even after overflow:hidden, so the grow keeps tracking
+     lazy-loaded photos. */
   const h = document.documentElement.scrollHeight;
   if (Math.abs(h - lastPostedH) <= 8) return;
   lastPostedH = h;
   try { parent.postMessage({ ckd: 'height', h }, '*'); } catch (_) {}
+  // let the grow land first (message round-trip), THEN lock — so no content is
+  // ever momentarily trapped below a not-yet-grown iframe.
+  if (!scrollLocked) setTimeout(lockInnerScroll, 500);
 }
 
 /* ============================= INPUT ============================= */
