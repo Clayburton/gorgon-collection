@@ -358,21 +358,10 @@ WP product page via its own `wordpress-embed.html`. Clone `baroque/` and swap:
   NEVER `position:fixed`**: fixed elements misbehave inside iOS iframes
   (every page here ships in a WP iframe) and skip rasterization in hidden
   tabs. World y maps page pixels; the piece scrolls with its slot.
-- **Embed iframe height MUST be full `100svh/100dvh` — NEVER `calc(100dvh - Npx)`.** A shorter-than-viewport iframe lets the WordPress site footer peek in under it (the calabria footer bug). Full height fills the screen, keeps the footer well below, and scroll-over-iframe scrolls internally. Clone the embed from a page whose LIVE embed is confirmed working — not from a file that may carry an un-pasted 'improvement'. (baroque's FILE had a -84px version that was never live; cloning the file, not the live block, is what introduced this.)
-- **Product-page embeds run TWO modes** (`baroque/wordpress-embed.html`):
-  desktop iframe stays viewport-sized (`calc(100dvh - 84px)`) and the page
-  scrolls INSIDE it — trackpad momentum never crosses the iframe boundary
-  (cross-frame scroll handoff was the "sticky scroll"); phones (≤700px) grow
-  the iframe via postMessage because iOS forces iframes to fit content.
-  Long-scroll pages must never rely on parent-page scrolling on desktop.
-- **svh is only honest when the iframe is viewport-sized.** Desktop embed:
-  iframe stays viewport-sized and scrolls internally → svh == real screen, use
-  it freely (hero, piece, peek all svh-based). Phone embed: iframe GROWS to
-  content → svh there would inflate and feed back into a taller layout, so the
-  `max-width:700px` block zeroes the hero `min-height` and sizes the piece by
-  vw/px instead. Breakpoints go by `max-width`, never `aspect-ratio` (aspect
-  ratio also reads the grown height). Earlier the desktop iframe grew too and
-  svh was poison everywhere — the two-mode embed is what made svh safe again.
+- **Embed iframe starts at full `100svh/100dvh` — NEVER `calc(100dvh - Npx)`.** That's only the PRE-grow height (fills the screen until the height message lands). A shorter-than-viewport start lets the WordPress footer peek in under it (the calabria footer bug). Clone the embed from a page whose LIVE embed is confirmed working — not from a file that may carry an un-pasted 'improvement'. (baroque's FILE had a -84px version that was never live; cloning the file, not the live block, is what introduced this.)
+- **Product-page embeds GROW the iframe to full content height on desktop AND phone** (`baroque/wordpress-embed.html` + `broadcastHeight()`): the page posts its `scrollHeight` and the embed sets `frame.style.height` to it, so the **WordPress page is the SOLE scroll container** — exactly like /design/. This replaced the old two-mode design (desktop kept viewport-sized and scrolled INTERNALLY). Two nested scroll containers is what caused the "sticky scroll" + stranded footer; ONE tall iframe the parent scrolls is smooth.
+- **When framed, the page LOCKS its own scroll after the grow** (`app.js` `lockInnerScroll()`): 500ms after the first height post, set `document.documentElement`+`body` `overflow:hidden`. The grow lands the iframe at the *floored* `scrollHeight`, leaving a sub-pixel of internal overflow that macOS latches a two-finger swipe onto → rubber-band "starts to move, springs back, next swipe works". `overflow:hidden` clips that sliver so nothing can latch; every swipe chains to the parent. `scrollHeight` still reports full content after `overflow:hidden`, so the grow keeps tracking lazy-loaded photos. Gated to `window.parent !== window` so direct github.io visits still scroll. **This fix rides entirely in the iframe's `app.js` — bumping `app.js?v=N` deploys it with no WordPress re-paste.**
+- **NO `svh`/`vh`/`dvh` in any CSS that feeds the posted height** (hero `min-height`, `#pieceSlot`, masthead `top`, corner offsets): the iframe GROWS in height, so a viewport-height unit inflates and feeds back into an ever-taller layout. Size those by `vw`/`px`. Breakpoints go by `max-width`, never `aspect-ratio` (aspect ratio also reads the grown height). All 11 product pages ship this way.
 - **Perf recipe for product pages**: DPR capped at 1.5 (page-tall canvas),
   render loop fully paused while the hero is offscreen (IntersectionObserver),
   piece position cached at layout (page coords are scroll-independent — no
