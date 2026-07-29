@@ -339,7 +339,7 @@ function layout() {
   // this room is a horizontal ROW beside a top-LEFT title, so it needs real
   // width — fall to the stacked column when the box isn't wide enough
   // (aspect < 1.35) so it's clean instead of cramped
-  portrait = w > 0 && (w < 700 || (w / Math.max(innerHeight, 1)) < 1.9);
+  portrait = w > 0 && (w < 700 || (w / Math.max(innerHeight, 1)) < 0.9);
 
   /* portrait: pixel-measured column — masthead height + N × (piece + placard).
      Width/content-driven only (never innerHeight), so the stage is exactly as
