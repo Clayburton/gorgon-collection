@@ -18,11 +18,11 @@ const COLLECTION = {
   /* a PERFECT ROW of three, left → right: Grain · Poppy · Sacred Vessel —
      the symbols left behind. Masthead sits top-LEFT (like the Gorgons). */
   products: [
-    { id:'grain',  name:'Wheat Sheaf',   date:'1st c. BCE', flip:true,
+    { id:'grain',  name:'Wheat Sheaf',   date:'1st c. BCE', price:'$27', flip:true,
       url:'https://clayandkelsy.com/eleusis-grain/', file:'../assets/grain.glb' },
-    { id:'poppy',  name:'Poppy',         date:'1st c. BCE', flip:true,
+    { id:'poppy',  name:'Poppy',         date:'1st c. BCE', price:'$27', flip:true,
       url:'https://clayandkelsy.com/eleusis-poppy/', file:'../assets/poppy.glb' },
-    { id:'vessel', name:'Sacred Vessel', date:'1st c. BCE', flip:true,
+    { id:'vessel', name:'Sacred Vessel', date:'1st c. BCE', price:'$27', flip:true,
       url:'https://clayandkelsy.com/eleusis-sacred-vessel/', file:'../assets/vessel.glb' },
   ],
   /* a VERY SLIGHT pink wall — sacred, initiatory, softer than the other two
@@ -291,7 +291,8 @@ Promise.all(COLLECTION.products.map((p) => new Promise((res, rej) =>
       `<div class="p-head"><span class="nm">${prod.name}</span>` +
       `<span class="lnk"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2">` +
       `<path d="M1.5 8.5 8.5 1.5 M3 1.5 H8.5 V7"/></svg></span></div>` +
-      `<span class="dt">${prod.date}</span>`;
+      `<span class="dt">${prod.date}` +
+      (prod.price ? `<span class="pr">${prod.price}</span>` : '') + `</span>`;
     label.addEventListener('click', () => navigate(i));
     // gliding from the piece down onto its placard keeps it presented + clickable
     label.addEventListener('pointerenter', () => { labelHold = i; });

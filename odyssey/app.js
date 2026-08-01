@@ -16,13 +16,13 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 const COLLECTION = {
   title: 'The Odyssey',
   products: [
-    { id:'odysseus', name:'Odysseus, King of Ithaca', date:'Homer’s Odyssey',
+    { id:'odysseus', name:'Odysseus, King of Ithaca', date:'Homer’s Odyssey', price:'$42',
       url:'https://clayandkelsy.com/odysseus-king-of-ithaca/', file:'../assets/odysseus.glb' },
-    { id:'athena',   name:'Athena / Minerva',         date:'1st–2nd century AD',
+    { id:'athena',   name:'Athena / Minerva',         date:'1st–2nd century AD', price:'$38',
       url:'https://clayandkelsy.com/athena-minerva/', file:'../assets/athena.glb' },
-    { id:'cyclops',  name:'Polyphemus, The Cyclops',  date:'2nd century',
+    { id:'cyclops',  name:'Polyphemus, The Cyclops',  date:'2nd century', price:'$42',
       url:'https://clayandkelsy.com/polyphemus-the-cyclops/', file:'../assets/cyclops.glb' },
-    { id:'shepherd', name:'Polyphemus, The Shepherd', date:'2nd century',
+    { id:'shepherd', name:'Polyphemus, The Shepherd', date:'2nd century', price:'$38',
       url:'https://clayandkelsy.com/polyphemus-the-shepherd/', file:'../assets/shepherd.glb' },
   ],
   /* cave wall: cool stone grays (the Gorgon room is warm paper — this one is
@@ -291,7 +291,8 @@ Promise.all(COLLECTION.products.map((p) => new Promise((res, rej) =>
       `<div class="p-head"><span class="nm">${prod.name}</span>` +
       `<span class="lnk"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2">` +
       `<path d="M1.5 8.5 8.5 1.5 M3 1.5 H8.5 V7"/></svg></span></div>` +
-      `<span class="dt">${prod.date}</span>`;
+      `<span class="dt">${prod.date}` +
+      (prod.price ? `<span class="pr">${prod.price}</span>` : '') + `</span>`;
     label.addEventListener('click', () => navigate(i));
     // gliding from the piece down onto its placard keeps it presented + clickable
     label.addEventListener('pointerenter', () => { labelHold = i; });
