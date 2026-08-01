@@ -76,6 +76,40 @@ body{ min-height:100%; overflow-x:hidden; }
   color:var(--muted);
 }
 
+/* ── collection tiers ─────────────────────────────────────────────
+   Gallery signage, not a sales banner: a hairline rule, the serif
+   voice for the sentence, and the steps as quiet mono. The percentages
+   are the only thing allowed to carry colour. */
+#masthead .tiers{
+  margin-top:1.15em;
+  padding-top:.95em;
+  border-top:1px solid var(--hair);
+  max-width:34ch;
+}
+#masthead .t-lead{
+  font-family:'EB Garamond', Georgia, serif;
+  font-size:clamp(13px, 1.68vmin, 15.5px);
+  line-height:1.5;
+  color:var(--ink);
+  opacity:.8;
+}
+#masthead .t-row{
+  margin-top:.62em;
+  display:flex;
+  gap:1.55em;               /* one line — the lead sentence carries the meaning */
+}
+#masthead .t-step{
+  display:inline-flex;
+  align-items:baseline;
+  gap:.5em;
+  font-family:'Courier Prime', ui-monospace, monospace;
+  font-size:clamp(10px, 1.22vmin, 11.5px);
+  letter-spacing:.08em;
+  white-space:nowrap;
+}
+#masthead .t-step b{ font-weight:700; color:var(--ink); }
+#masthead .t-step i{ font-style:normal; color:var(--pink); }
+
 #hint{
   position:absolute; left:clamp(22px, 4.2vw, 56px); bottom:clamp(18px, 3.4vh, 34px);
   font-size:clamp(11px, 1.35vmin, 13px);
@@ -149,6 +183,19 @@ body{ min-height:100%; overflow-x:hidden; }
 }
 .placard .lnk svg{ width:.62em; height:.62em; display:block; }
 .placard.on:hover .lnk{ color:var(--pink); border-color:var(--pink); transform:translate(1px,-1px); }
+/* price rides the placard's mono date line — a hairline dot divides
+   them so it reads as one caption, not a bolted-on price tag */
+.placard .pr{
+  color:var(--ink);
+  font-weight:700;
+  letter-spacing:.12em;
+}
+.placard .pr::before{
+  content:'·';
+  margin:0 .6em 0 .55em;
+  color:var(--hair);
+  font-weight:400;
+}
 .placard .dt{
   display:block;
   margin-top:.45em;

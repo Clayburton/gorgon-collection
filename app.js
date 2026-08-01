@@ -15,14 +15,14 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 const COLLECTION = {
   title: 'Gorgon Collection',
   products: [
-    { id:'calabria', name:'Medusa Calabria Italy', date:'2nd–1st BCE',
+    { id:'calabria', name:'Medusa Calabria Italy', date:'2nd–1st BCE', price:'$45',
       url:'https://clayandkelsy.com/medusa-calabria-italy/', file:'assets/calabria.glb' },
-    { id:'baroque',  name:'Medusa Baroque Europe', date:'17th Century',
+    { id:'baroque',  name:'Medusa Baroque Europe', date:'17th Century', price:'$45',
       url:'https://clayandkelsy.com/medusa-baroque-europe/', file:'assets/baroque.glb' },
-    { id:'winged',   name:'Winged Medusa Egypt',   date:'332–250 BCE',
+    { id:'winged',   name:'Winged Medusa Egypt',   date:'332–250 BCE', price:'$42',
       url:'https://clayandkelsy.com/medusa-winged-egypt/', file:'assets/winged.glb',
       hoverScale: 1.17 },   // wide plaque, small face — meets the others at full hover
-    { id:'southern', name:'Medusa Southern Italy', date:'500 BCE',
+    { id:'southern', name:'Medusa Southern Italy', date:'500 BCE', price:'$42',
       url:'https://clayandkelsy.com/medusa-southern-italy/', file:'assets/southern.glb' },
   ],
   /* the light "gallery wall" behind everything — retune per collection */
@@ -286,7 +286,8 @@ Promise.all(COLLECTION.products.map((p) => new Promise((res, rej) =>
       `<div class="p-head"><span class="nm">${prod.name}</span>` +
       `<span class="lnk"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2">` +
       `<path d="M1.5 8.5 8.5 1.5 M3 1.5 H8.5 V7"/></svg></span></div>` +
-      `<span class="dt">${prod.date}</span>`;
+      `<span class="dt">${prod.date}` +
+      (prod.price ? `<span class="pr">${prod.price}</span>` : '') + `</span>`;
     label.addEventListener('click', () => navigate(i));
     // gliding from the piece down onto its placard keeps it presented + clickable
     label.addEventListener('pointerenter', () => { labelHold = i; });
