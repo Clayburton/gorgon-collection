@@ -10,7 +10,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-import PHOTOS from './photos.js?v=3';   // bump when photos.js is regenerated
+import PHOTOS from './photos.js?v=4';   // bump when photos.js is regenerated
 
 const PIECE = {
   file: '../assets/winged.glb', assetV: 6,
