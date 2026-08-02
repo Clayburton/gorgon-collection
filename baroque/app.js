@@ -20,7 +20,17 @@ const PIECE = {
      page for another piece is a data edit: swap the siblings and the set line.
      Tier discount is automatic in the cart (WooCommerce → Discount Rules →
      "CKDesign — Collection Tiers": 2 = 15%, 3 = 20%, 4+ = 25%). */
-  set: { name: 'Gorgon Collection', count: 'four', was: '$174', now: '$130.50', off: '25%' },
+  /* MULTI-ADD: WooCommerce's GROUPED add-to-cart handler loops over whatever
+     `quantity[ID]` you pass and never checks those products are children of the
+     grouped product — so any grouped-product id works purely as a trigger and
+     the quantity[] list decides what actually lands in the cart. 2652 is the Osc
+     Collection grouped product, used here only as that trigger (no synths are
+     added — verified: this link yields exactly the 4 Gorgons at $130.50).
+     The trigger MUST be a grouped product; pointing it at a simple product
+     makes Woo ignore the list and add only that one item. */
+  set: { name: 'Gorgon Collection', count: 'four', was: '$174', now: '$130.50', off: '25%',
+         cart: 'https://clayandkelsy.com/cart/?add-to-cart=2652' +
+               '&quantity[6379]=1&quantity[6385]=1&quantity[6393]=1&quantity[6371]=1' },
   siblings: [
     { name: 'Medusa, Calabria Italy', date: '2nd–1st BCE', price: '$45',
       thumb: '../assets/thumbs/calabria.jpg',
@@ -425,6 +435,15 @@ canvas.addEventListener('pointercancel', endInspect);
       `The complete <span class="s-nm">${PIECE.set.name}</span> &mdash; all ${PIECE.set.count} ` +
       `<s>${PIECE.set.was}</s> <b>${PIECE.set.now}</b>` +
       `<span class="s-note mono">${PIECE.set.off} off &mdash; applied automatically in the cart</span>`;
+  }
+
+  // one click puts the whole set in the cart, already discounted
+  const allEl = document.getElementById('cAll');
+  if (allEl && PIECE.set && PIECE.set.cart) {
+    allEl.href = PIECE.set.cart;
+    allEl.target = '_top';
+    allEl.innerHTML = `[ add all ${PIECE.set.count} &mdash; ${PIECE.set.now} ]`;
+    allEl.hidden = false;
   }
 })();
 

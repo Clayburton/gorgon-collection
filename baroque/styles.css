@@ -467,3 +467,13 @@ body{ min-height:100%; position:relative; }
   .c-pr{ display:block; margin-top:.35em; }
   .c-pr::before{ content:none; }
 }
+
+/* the whole-set button — the completion payoff, one click */
+#cAll{
+  display:inline-flex;
+  margin:1.5em auto 0;
+}
+#cAll[hidden]{ display:none !important; }   /* author display beats [hidden] */
+.c-set + #cAll{ margin-top:1.5em; }
+#collect{ text-align:center; }
+#collect .c-grid, #collect .c-card{ text-align:center; }
