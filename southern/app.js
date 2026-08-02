@@ -15,6 +15,30 @@ import PHOTOS from './photos.js?v=1';   // bump when photos.js is regenerated
 const PIECE = {
   file: '../assets/southern.glb', assetV: 6,
   cartUrl: 'https://clayandkelsy.com/cart/?add-to-cart=6371',   // WooCommerce product 6371
+  /* MULTI-ADD: WooCommerce's GROUPED add-to-cart handler loops over whatever
+     `quantity[ID]` you pass and never checks those products are children of the
+     grouped product — so 2652 (the Osc Collection grouped product) works purely
+     as a trigger and the quantity[] list decides what lands in the cart. The
+     trigger MUST be a grouped product. Tier discount is automatic in the cart
+     (WooCommerce → Discount Rules → "CKDesign — Collection Tiers").
+     Cloning this page for another piece is a data edit: swap these two blocks. */
+  set: { name: 'Gorgon Collection', count: 'four', was: '$174', now: '$130.50', off: '25%',
+         cart: 'https://clayandkelsy.com/cart/?add-to-cart=2652' +
+               '&quantity[6379]=1&quantity[6385]=1&quantity[6393]=1&quantity[6371]=1' },
+  siblings: [
+    { name: 'Medusa, Calabria Italy', date: '2nd–1st BCE', price: '$45',
+      thumb: '../assets/thumbs/calabria.jpg',
+      url:  'https://clayandkelsy.com/medusa-calabria-italy/',
+      cart: 'https://clayandkelsy.com/cart/?add-to-cart=6379' },
+    { name: 'Medusa, Baroque Europe', date: '17th Century', price: '$45',
+      thumb: '../assets/thumbs/baroque.jpg',
+      url:  'https://clayandkelsy.com/medusa-baroque-europe/',
+      cart: 'https://clayandkelsy.com/cart/?add-to-cart=6385' },
+    { name: 'Winged Medusa, Egypt', date: '332–250 BCE', price: '$42',
+      thumb: '../assets/thumbs/winged.jpg',
+      url:  'https://clayandkelsy.com/medusa-winged-egypt/',
+      cart: 'https://clayandkelsy.com/cart/?add-to-cart=6393' },
+  ],
 };
 
 const P = {
@@ -369,6 +393,46 @@ function endInspect(e) {
 }
 canvas.addEventListener('pointerup', endInspect);
 canvas.addEventListener('pointercancel', endInspect);
+
+/* "complete the collection" — build the sibling cards from PIECE.siblings.
+   Every link is target="_top": this page ships inside an iframe. */
+(function buildCollect() {
+  const grid = document.getElementById('cGrid');
+  if (!grid || !PIECE.siblings) return;
+
+  grid.innerHTML = PIECE.siblings.map((s) => `
+    <article class="c-card">
+      <a class="c-shot" href="${s.url}" target="_top" aria-label="${s.name}">
+        <img src="${s.thumb}" alt="${s.name}" loading="lazy" decoding="async" width="440" height="550">
+      </a>
+      <div class="c-meta">
+        <a class="c-name" href="${s.url}" target="_top">${s.name}</a>
+        <p class="c-sub mono">${s.date}<span class="c-pr">${s.price}</span></p>
+      </div>
+      <a class="c-add mono" href="${s.cart}" target="_top">[ add ]</a>
+    </article>`).join('');
+
+  // a 2-piece room must not sit in a 3-column grid with a hole in it
+  grid.classList.toggle('c-2', PIECE.siblings.length === 2);
+
+  // the set line only makes sense once the numbers are configured
+  const setEl = document.getElementById('cSet');
+  if (setEl && PIECE.set) {
+    setEl.innerHTML =
+      `The complete <span class="s-nm">${PIECE.set.name}</span> &mdash; all ${PIECE.set.count} ` +
+      `<s>${PIECE.set.was}</s> <b>${PIECE.set.now}</b>` +
+      `<span class="s-note mono">${PIECE.set.off} off &mdash; applied automatically in the cart</span>`;
+  }
+
+  // one click puts the whole set in the cart, already discounted
+  const allEl = document.getElementById('cAll');
+  if (allEl && PIECE.set && PIECE.set.cart) {
+    allEl.href = PIECE.set.cart;
+    allEl.target = '_top';
+    allEl.innerHTML = `[ add all ${PIECE.set.count} &mdash; ${PIECE.set.now} ]`;
+    allEl.hidden = false;
+  }
+})();
 
 /* cart buttons (hero + outro) — live WooCommerce link opens in the TOP window
    (this page ships inside an iframe); without a link they pulse politely */

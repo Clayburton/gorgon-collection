@@ -428,6 +428,9 @@ canvas.addEventListener('pointercancel', endInspect);
       <a class="c-add mono" href="${s.cart}" target="_top">[ add ]</a>
     </article>`).join('');
 
+  // a 2-piece room must not sit in a 3-column grid with a hole in it
+  grid.classList.toggle('c-2', PIECE.siblings.length === 2);
+
   // the set line only makes sense once the numbers are configured
   const setEl = document.getElementById('cSet');
   if (setEl && PIECE.set) {

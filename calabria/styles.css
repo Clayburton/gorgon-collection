@@ -307,3 +307,179 @@ body{ min-height:100%; position:relative; }
 @media (prefers-reduced-motion: reduce){
   .cta{ transition:none; }
 }
+
+/* ══ tier note under the buy row ═══════════════════════════════════
+   One quiet line. The "+" sits in a hairline square so it reads as an
+   invitation to add, not as decoration. */
+.tier-note{
+  margin-top:.85em;
+  display:inline-flex;
+  align-items:center;
+  gap:.7em;
+  font-size:clamp(10px,1.2vmin,11.5px);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.tier-note span{
+  display:grid; place-items:center;
+  width:1.7em; height:1.7em;
+  border:1px solid var(--hair);
+  border-radius:4px;
+  font-size:1.05em; line-height:1;
+  color:var(--ink);
+}
+.tier-note i{ font-style:normal; color:var(--pink); font-weight:700; }
+
+/* ══ complete the collection ═══════════════════════════════════════
+   A gallery shelf, not a cross-sell rail: hairline rule above, the
+   pieces given room to breathe, the money kept small and mono. */
+#collect{
+  max-width:1060px;
+  margin:0 auto;
+  padding:clamp(30px,3.4vw,58px) clamp(22px,4.2vw,56px) clamp(10px,1.4vw,22px);
+  border-top:1px solid var(--hair);
+}
+.c-head{ text-align:center; }
+.c-kicker{
+  font-size:clamp(10.5px,1.3vmin,12.5px);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.c-lead{
+  margin-top:.9em;
+  font-family:'EB Garamond', Georgia, serif;
+  font-size:clamp(17px,2.3vmin,22px);
+  line-height:1.5;
+  color:var(--ink);
+}
+.c-row{
+  margin-top:.95em;
+  display:flex; justify-content:center;
+  gap:clamp(16px,2.4vw,34px);
+}
+.c-step{
+  display:inline-flex; align-items:baseline; gap:.5em;
+  font-size:clamp(10px,1.22vmin,11.5px);
+  letter-spacing:.08em;
+  white-space:nowrap;
+  color:var(--muted);
+}
+.c-step b{ font-weight:700; color:var(--ink); }
+.c-step i{ font-style:normal; color:var(--pink); }
+
+.c-grid{
+  margin-top:clamp(30px,3.6vw,52px);
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:clamp(18px,2.6vw,38px);
+}
+.c-card{
+  display:flex; flex-direction:column;
+  align-items:center;
+  text-align:center;
+  height:100%;              /* grid stretches the cards, so… */
+}
+.c-shot{
+  display:block; width:100%;
+  border-radius:12px;
+  overflow:hidden;
+  background:rgba(38,32,44,.04);
+  box-shadow:0 16px 40px rgba(38,32,44,.13), 0 2px 7px rgba(38,32,44,.06);
+  transition:transform .38s cubic-bezier(.2,.7,.3,1), box-shadow .38s ease;
+}
+.c-shot img{
+  display:block; width:100%; height:auto;
+  aspect-ratio:4/5; object-fit:cover;
+}
+.c-card:hover .c-shot{
+  transform:translateY(-5px);
+  box-shadow:0 26px 58px rgba(38,32,44,.19), 0 3px 10px rgba(38,32,44,.08);
+}
+.c-meta{ margin-top:1.05em; margin-bottom:1em; }
+.c-name{
+  font-family:'Cormorant Garamond', Georgia, serif;
+  font-weight:600;
+  font-size:clamp(16px,2.05vmin,21px);
+  letter-spacing:.012em;
+  color:var(--ink);
+  text-decoration:none;
+  transition:color .25s ease;
+}
+.c-card:hover .c-name{ color:var(--pink); }
+.c-sub{
+  margin-top:.42em;
+  font-size:clamp(9.5px,1.15vmin,11px);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.c-pr{ color:var(--ink); font-weight:700; letter-spacing:.12em; }
+.c-pr::before{
+  content:'\00b7'; margin:0 .55em 0 .5em;
+  color:var(--hair); font-weight:400;
+}
+.c-add{
+  margin-top:auto;          /* …pin every [ add ] to a shared baseline,
+                               however many lines the name above wraps to */
+  display:inline-flex; align-items:center;
+  padding:.62em 1.15em;
+  border:1px solid var(--hair);
+  border-radius:7px;
+  color:var(--muted);
+  text-decoration:none;
+  font-size:clamp(10px,1.2vmin,11.5px);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  transition:color .25s ease, border-color .25s ease, background .25s ease;
+}
+.c-add:hover{ color:#f4f0e8; background:var(--ink); border-color:var(--ink); }
+
+/* the set line — the completion payoff, stated once, quietly */
+.c-set{
+  margin-top:clamp(26px,3vw,42px);
+  text-align:center;
+  font-family:'EB Garamond', Georgia, serif;
+  font-size:clamp(15px,1.95vmin,18.5px);
+  color:var(--ink);
+}
+.c-set .s-nm{ font-style:italic; }
+.c-set s{ color:var(--muted); text-decoration-thickness:1px; margin-left:.25em; }
+.c-set b{ font-weight:600; margin-left:.35em; }
+.c-set .s-note{
+  display:block;
+  margin-top:.7em;
+  font-family:'Courier Prime', ui-monospace, monospace;
+  font-size:clamp(9.5px,1.15vmin,11px);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+@media (max-width:700px){
+  .c-grid{ grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; }
+  .c-add{ padding:.55em .8em; letter-spacing:.1em; }
+  .c-row{ gap:14px; }
+  /* at ~100px a column the caption can't hold "DATE · $NN" on one line and
+     each card wraps differently — stack them so all three read identically */
+  .c-sub{ letter-spacing:.1em; }
+  .c-pr{ display:block; margin-top:.35em; }
+  .c-pr::before{ content:none; }
+}
+
+/* the whole-set button — the completion payoff, one click */
+#cAll{
+  display:inline-flex;
+  margin:1.5em auto 0;
+}
+#cAll[hidden]{ display:none !important; }   /* author display beats [hidden] */
+.c-set + #cAll{ margin-top:1.5em; }
+#collect{ text-align:center; }
+#collect .c-grid, #collect .c-card{ text-align:center; }
+
+/* a room with only two other pieces centres on two columns */
+.c-grid.c-2{
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  max-width:660px; margin-left:auto; margin-right:auto;
+}

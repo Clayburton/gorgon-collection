@@ -477,3 +477,9 @@ body{ min-height:100%; position:relative; }
 .c-set + #cAll{ margin-top:1.5em; }
 #collect{ text-align:center; }
 #collect .c-grid, #collect .c-card{ text-align:center; }
+
+/* a room with only two other pieces centres on two columns */
+.c-grid.c-2{
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  max-width:660px; margin-left:auto; margin-right:auto;
+}
