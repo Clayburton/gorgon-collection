@@ -15,6 +15,11 @@ import PHOTOS from './photos.js?v=4';
 const PIECE = {
   file: '../assets/athena.glb', assetV: 1,
   cartUrl: 'https://clayandkelsy.com/cart/?add-to-cart=6336',   // WooCommerce product 6336
+
+  /* Physical size — measured from the print file. Small objects live or die
+     on this: without it people either don't buy, or buy and are disappointed. */
+  dims: { mm: '29 &times; 63 mm', in: '1.1&Prime; &times; 2.5&Prime;',
+          deep: '23 mm (0.9&Prime;) deep' },
   /* MULTI-ADD: WooCommerce's GROUPED add-to-cart handler loops over whatever
      `quantity[ID]` you pass and never checks those products are children of the
      grouped product — so 2652 (the Osc Collection grouped product) works purely
@@ -404,6 +409,16 @@ function endInspect(e) {
 }
 canvas.addEventListener('pointerup', endInspect);
 canvas.addEventListener('pointercancel', endInspect);
+
+/* size line under the buy row — the question that stops people buying a
+   small object, answered before they have to ask */
+(function buildDims() {
+  const el = document.getElementById('dims');
+  if (!el || !PIECE.dims) return;
+  el.innerHTML = `<span class="d-mm">${PIECE.dims.mm}</span>` +
+                 `<span class="d-in">(${PIECE.dims.in})</span>`;
+  el.hidden = false;
+})();
 
 /* "complete the collection" — build the sibling cards from PIECE.siblings.
    Every link is target="_top": this page ships inside an iframe. */

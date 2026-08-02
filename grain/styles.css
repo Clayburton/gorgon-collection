@@ -484,3 +484,23 @@ body{ min-height:100%; position:relative; }
   grid-template-columns:repeat(2, minmax(0,1fr));
   max-width:660px; margin-left:auto; margin-right:auto;
 }
+
+/* ══ physical size ═════════════════════════════════════════════════
+   Sits directly under the buy row, above the softer micro line — the
+   millimetres carry the weight in ink, the inches follow in muted so
+   an American reader gets it without doing the maths. A hairline rule
+   on the left marks it as a spec rather than more prose. */
+.dims{
+  margin-top:1.15em;
+  display:inline-flex;
+  align-items:baseline;
+  gap:.75em;
+  padding-left:.9em;
+  border-left:2px solid var(--hair);
+  font-size:clamp(11.5px,1.42vmin,13.5px);
+  letter-spacing:.13em;
+  text-transform:uppercase;
+}
+.dims[hidden]{ display:none !important; }   /* author display beats [hidden] */
+.dims .d-mm{ color:var(--ink); font-weight:700; }
+.dims .d-in{ color:var(--muted); letter-spacing:.1em; }
