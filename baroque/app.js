@@ -16,6 +16,12 @@ const PIECE = {
   file: '../assets/baroque.glb', assetV: 6,
   cartUrl: 'https://clayandkelsy.com/cart/?add-to-cart=6385',   // WooCommerce product 6385
 
+  /* Physical size — measured from the print file (Gorgon STL/Medusa Baroque
+     Europe.stl). Small objects live or die on this: without it people either
+     don't buy, or buy and are disappointed. */
+  dims: { mm: '53 &times; 50 mm', in: '2.1&Prime; &times; 2.0&Prime;',
+          deep: '25 mm (1&Prime;) deep' },
+
   /* "complete the collection" — the other pieces from this room. Cloning this
      page for another piece is a data edit: swap the siblings and the set line.
      Tier discount is automatic in the cart (WooCommerce → Discount Rules →
@@ -409,6 +415,16 @@ function endInspect(e) {
 }
 canvas.addEventListener('pointerup', endInspect);
 canvas.addEventListener('pointercancel', endInspect);
+
+/* size line under the buy row — the question that stops people buying a
+   small object, answered before they have to ask */
+(function buildDims() {
+  const el = document.getElementById('dims');
+  if (!el || !PIECE.dims) return;
+  el.innerHTML = `<span class="d-mm">${PIECE.dims.mm}</span>` +
+                 `<span class="d-in">(${PIECE.dims.in})</span>`;
+  el.hidden = false;
+})();
 
 /* "complete the collection" — build the sibling cards from PIECE.siblings.
    Every link is target="_top": this page ships inside an iframe. */
