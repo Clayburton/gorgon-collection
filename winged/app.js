@@ -10,7 +10,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-import PHOTOS from './photos.js?v=2';   // bump when photos.js is regenerated
+import PHOTOS from './photos.js?v=3';   // bump when photos.js is regenerated
 
 const PIECE = {
   file: '../assets/winged.glb', assetV: 6,
@@ -27,15 +27,15 @@ const PIECE = {
                '&quantity[6379]=1&quantity[6385]=1&quantity[6393]=1&quantity[6371]=1' },
   siblings: [
     { name: 'Medusa, Calabria Italy', date: '2nd–1st BCE', price: '$45',
-      thumb: '../assets/thumbs/calabria.jpg?v=2',
+      thumb: '../assets/thumbs/calabria.webp?v=3',
       url:  'https://clayandkelsy.com/medusa-calabria-italy/',
       cart: 'https://clayandkelsy.com/cart/?add-to-cart=6379' },
     { name: 'Medusa, Baroque Europe', date: '17th Century', price: '$45',
-      thumb: '../assets/thumbs/baroque.jpg?v=2',
+      thumb: '../assets/thumbs/baroque.webp?v=3',
       url:  'https://clayandkelsy.com/medusa-baroque-europe/',
       cart: 'https://clayandkelsy.com/cart/?add-to-cart=6385' },
     { name: 'Medusa, Southern Italy', date: '500 BCE', price: '$42',
-      thumb: '../assets/thumbs/southern.jpg?v=2',
+      thumb: '../assets/thumbs/southern.webp?v=3',
       url:  'https://clayandkelsy.com/medusa-southern-italy/',
       cart: 'https://clayandkelsy.com/cart/?add-to-cart=6371' },
   ],
