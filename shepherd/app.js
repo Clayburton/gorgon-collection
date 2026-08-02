@@ -10,7 +10,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-import PHOTOS from './photos.js';
+import PHOTOS from './photos.js?v=2';
 
 const PIECE = {
   file: '../assets/shepherd.glb', assetV: 1,
@@ -27,15 +27,15 @@ const PIECE = {
                '&quantity[6417]=1&quantity[6336]=1&quantity[6397]=1&quantity[6399]=1' },
   siblings: [
     { name: 'Odysseus, King of Ithaca', date: 'Homer’s Odyssey', price: '$42',
-      thumb: '../assets/thumbs/odysseus.jpg',
+      thumb: '../assets/thumbs/odysseus.jpg?v=2',
       url:  'https://clayandkelsy.com/odysseus-king-of-ithaca/',
       cart: 'https://clayandkelsy.com/cart/?add-to-cart=6417' },
     { name: 'Athena / Minerva', date: '1st–2nd century AD', price: '$38',
-      thumb: '../assets/thumbs/athena.jpg',
+      thumb: '../assets/thumbs/athena.jpg?v=2',
       url:  'https://clayandkelsy.com/athena-minerva/',
       cart: 'https://clayandkelsy.com/cart/?add-to-cart=6336' },
     { name: 'Polyphemus, The Cyclops', date: '2nd century', price: '$42',
-      thumb: '../assets/thumbs/cyclops.jpg',
+      thumb: '../assets/thumbs/cyclops.jpg?v=2',
       url:  'https://clayandkelsy.com/polyphemus-the-cyclops/',
       cart: 'https://clayandkelsy.com/cart/?add-to-cart=6397' },
   ],

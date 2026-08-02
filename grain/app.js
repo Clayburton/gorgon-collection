@@ -10,7 +10,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-import PHOTOS from './photos.js';
+import PHOTOS from './photos.js?v=2';
 
 const PIECE = {
   file: '../assets/grain.glb', assetV: 1,
@@ -28,11 +28,11 @@ const PIECE = {
                '&quantity[6410]=1&quantity[6413]=1&quantity[6415]=1' },
   siblings: [
     { name: 'Poppy', date: '1st c. BCE', price: '$27',
-      thumb: '../assets/thumbs/poppy.jpg',
+      thumb: '../assets/thumbs/poppy.jpg?v=2',
       url:  'https://clayandkelsy.com/eleusis-poppy/',
       cart: 'https://clayandkelsy.com/cart/?add-to-cart=6413' },
     { name: 'Sacred Vessel', date: '1st c. BCE', price: '$27',
-      thumb: '../assets/thumbs/vessel.jpg',
+      thumb: '../assets/thumbs/vessel.jpg?v=2',
       url:  'https://clayandkelsy.com/eleusis-sacred-vessel/',
       cart: 'https://clayandkelsy.com/cart/?add-to-cart=6415' },
   ],
