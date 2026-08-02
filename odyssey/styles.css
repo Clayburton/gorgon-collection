@@ -230,3 +230,6 @@ body{ min-height:100%; overflow-x:hidden; }
   .placard{ transition:none; }
   #flash{ transition:opacity .1s linear; }
 }
+
+/* shipping, stated high up so nobody has to hunt for it */
+#masthead .note.ship{ margin-top:.5em; }
