@@ -359,7 +359,15 @@ function layout() {
   // let a WordPress embed grow its iframe to fit the column (only when it changes —
   // re-posting on every layout ping-pongs with the growing iframe)
   const postH = stage.clientHeight || innerHeight;
-  if (fontsReady && window.parent !== window && Math.abs(postH - lastPostedH) > 8) {
+  /* Only PORTRAIT genuinely needs this: there the stage grows into a measured
+     pixel column and the host iframe must grow with it. On desktop the stage is
+     exactly 100dvh — which the embed's own CSS already sets — so posting is
+     redundant, and EVERY post schedules the host's pinTop(), which yanked
+     desktop readers back to the top mid-scroll (reported on Chrome/Windows,
+     reproduced locally). `lastPostedH > 0` still lets a portrait->desktop
+     resize post the corrected height so the iframe never stays stuck tall. */
+  const needPost = portrait || lastPostedH > 0;
+  if (needPost && fontsReady && window.parent !== window && Math.abs(postH - lastPostedH) > 8) {
     lastPostedH = postH;
     /* ckdCol (NOT ckd) — the /design/ page hosts BOTH collection iframes, and
        the Gorgon embed's listener acts on any {ckd:'height'} from this origin.
@@ -656,3 +664,4 @@ window.__relics = {
   ptr(x, y) { ndc.set(x, y); pointerOn = true; renderOnce(perfNow() * 0.001); },
   relics,
 };
+

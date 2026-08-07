@@ -20,6 +20,29 @@
 <script>
   (function () {
     var frame = document.getElementById('ckd-gorgon-frame');
+    // FULL-BLEED, SCROLLBAR-SAFE. CSS `width:100vw` INCLUDES the vertical
+    // scrollbar, so on Windows (classic, non-overlay scrollbars) every block is
+    // ~15px wider than the viewport — the page gains a horizontal scrollbar and
+    // wheel scrolling feels wrong. documentElement.clientWidth EXCLUDES the
+    // scrollbar, so measure and pull the block to the true left edge instead.
+    var wrap = frame.parentNode;
+    function fullBleed () {
+      wrap.style.width = '';
+      wrap.style.marginLeft = '';
+      wrap.style.marginRight = '';
+      var vw = document.documentElement.clientWidth || window.innerWidth || 0;
+      // a hidden/background tab can measure 0 — never collapse the block to
+      // nothing; just leave the CSS 100vw fallback in place and try again later
+      if (vw < 200) return;
+      var left = wrap.getBoundingClientRect().left;
+      wrap.style.width = vw + 'px';
+      wrap.style.marginLeft = (-left) + 'px';
+      wrap.style.marginRight = '0px';
+    }
+    fullBleed();
+    addEventListener('resize', fullBleed, { passive: true });
+    addEventListener('load', fullBleed);
+
     addEventListener('message', function (e) {
       if (e.origin !== 'https://clayburton.github.io') return;
       var d = e.data || {};
@@ -71,20 +94,46 @@
     // safety valve: if the overlay is ever stuck, a click/tap dismisses it
     ov.addEventListener('click', clearOv);
 
-    // keep the page at the TOP while the collection blocks grow during load —
+    // Keep the page at the TOP while the collection blocks grow during load —
     // on phones the growing iframes otherwise leave the page scrolled
-    // mid-collection. Disarms the instant the visitor touches/scrolls, and
-    // retires 6s after load, so it can never fight a real scroll.
-    var moved = false, t0 = Date.now();
+    // mid-collection.
+    //
+    // THE TRAP (fixed 2026-08-07): the collection iframes are a full viewport
+    // tall, so the visitor's pointer sits over a CROSS-ORIGIN iframe — and
+    // wheel/pointerdown/touchstart over one NEVER reach this window. The old
+    // disarm list therefore could not fire, while Chrome still chained the
+    // scroll through to this page. Every height message then yanked the reader
+    // back to the top mid-scroll. Reported on Chrome/Windows ("scrolling gets
+    // stuck, I had to grab the scrollbar") and reproduced locally.
+    // The fix: the rooms now post {ckd:'userinput'} on first interaction, which
+    // is the only signal that survives the origin boundary. Window shortened to
+    // 2.5s so even a total failure to disarm can't spoil a real read.
+    var moved = false, t0 = Date.now(), selfScrollAt = 0;
+    function disarm () { moved = true; }
     ['touchstart', 'wheel', 'keydown', 'pointerdown'].forEach(function (ev) {
-      addEventListener(ev, function () { moved = true; }, { once: true, passive: true });
+      addEventListener(ev, disarm, { once: true, passive: true });
     });
+    // ANY scroll we did not cause ourselves means the visitor is driving. This is
+    // what catches a scrollbar drag — the exact workaround the visitor who
+    // reported this had to resort to — and it needs no cooperation from the
+    // iframe. Content growing below the fold does not move scrollY, so this does
+    // not disarm the guard in the case it actually exists for.
+    addEventListener('scroll', function () {
+      if (Date.now() - selfScrollAt > 300) disarm();
+    }, { passive: true });
+    // Bound the blast radius: only ever correct a SMALL offset. Layout growth
+    // nudges the page by a little; a reader who is 400px+ down is deliberately
+    // reading and must never be yanked, whatever else fails to disarm.
     function pinTop () {
-      if (!moved && Date.now() - t0 < 6000 && scrollY > 0) scrollTo(0, 0);
+      if (moved || Date.now() - t0 > 2500) return;
+      if (scrollY <= 0 || scrollY > 400) return;
+      selfScrollAt = Date.now();
+      scrollTo(0, 0);
     }
     addEventListener('message', function (e) {
       if (e.origin !== 'https://clayburton.github.io') return;
       var d = e.data || {};
+      if (d.ckd === 'userinput') { disarm(); return; }   // interaction inside a room
       if (d.ckd === 'height' || d.ckdCol) setTimeout(pinTop, 60);
     });
     addEventListener('load', function () { setTimeout(pinTop, 120); });
