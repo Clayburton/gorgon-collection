@@ -37,24 +37,6 @@
 <link rel="preload" as="fetch" crossorigin fetchpriority="high" href="../assets/athena.glb?v=1">
 <link rel="preload" as="fetch" crossorigin fetchpriority="high" href="../assets/cyclops.glb?v=1">
 <link rel="preload" as="fetch" crossorigin fetchpriority="high" href="../assets/shepherd.glb?v=1">
-<!-- Tell the host page the visitor has interacted. Inline and FIRST: the host's
-     "pin to top while blocks grow" guard listens for wheel/pointerdown on itself,
-     but this room is a cross-origin iframe filling the viewport so those events
-     never reach it. This must not wait on the three.js import graph — an early
-     scroll has to disarm the host too. -->
-<script>
-(function () {
-  if (window.parent === window) return;
-  var sent = false;
-  function tell () {
-    if (sent) return; sent = true;
-    try { parent.postMessage({ ckd: 'userinput' }, '*'); } catch (e) {}
-  }
-  ['pointerdown','wheel','touchstart','keydown'].forEach(function (ev) {
-    addEventListener(ev, tell, { once: true, passive: true });
-  });
-})();
-</script>
 </head>
 <body>
 
@@ -87,6 +69,6 @@
   <div id="flash" aria-hidden="true"></div>
 </div>
 
-<script type="module" src="app.js?v=17"></script>
+<script type="module" src="app.js?v=18"></script>
 </body>
 </html>

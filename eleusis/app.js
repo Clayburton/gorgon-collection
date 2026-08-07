@@ -319,6 +319,12 @@ Promise.all(COLLECTION.products.map((p) => new Promise((res, rej) =>
 
 /* ============================= LAYOUT ============================= */
 let halfW = 1, halfH = 1, portrait = false, coarse = false;
+/* True viewport height. Once the host grows this iframe to a pixel column,
+   innerHeight becomes that COLUMN, not the viewport — so an aspect test against
+   it latches permanently portrait (measured: still 'portrait' at 1400px wide,
+   which then re-grew the column and ratcheted). Refresh it only while the stage
+   is un-grown, when innerHeight is honest. */
+let baseVH = innerHeight || 800;
 let lastGlW = 0, lastGlH = 0, lastPostedH = 0;
 
 /* fonts gate: the mobile column height depends on the masthead's RENDERED
@@ -340,7 +346,8 @@ function layout() {
   // this room is a horizontal ROW beside a top-LEFT title, so it needs real
   // width — fall to the stacked column when the box isn't wide enough
   // (aspect < 1.35) so it's clean instead of cramped
-  portrait = w > 0 && (w < 700 || (w / Math.max(innerHeight, 1)) < 0.9);
+  if (!stage.style.height) baseVH = innerHeight || baseVH;   // un-grown: honest
+  portrait = w > 0 && (w < 700 || (w / Math.max(baseVH, 1)) < 0.9);
 
   /* portrait: pixel-measured column — masthead height + N × (piece + placard).
      Width/content-driven only (never innerHeight), so the stage is exactly as
