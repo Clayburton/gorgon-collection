@@ -269,3 +269,38 @@ body{ min-height:100%; overflow-x:hidden; }
 
 /* shipping, stated high up so nobody has to hunt for it */
 #masthead .note.ship{ margin-top:.5em; }
+
+/* ══ placard Add-to-cart — a slim outlined pill, understated gallery feel.
+   Reveals WITH the placard on desktop hover (same moment the price appears);
+   always visible on mobile. The actual cart add is first-party on
+   clayandkelsy.com (see the companion script) — this only posts the piece up. */
+.placard .p-add{
+  display:flex; align-items:center; justify-content:center;
+  width:100%;
+  min-height:42px;
+  margin-top:.75em;
+  padding:.5em 1em;
+  border:1px solid var(--hair);
+  border-radius:8px;
+  background:transparent;
+  color:var(--muted);
+  font-family:'Courier Prime', ui-monospace, monospace;
+  font-size:clamp(10px, 1.15vmin, 12px);
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  cursor:pointer;
+  -webkit-appearance:none; appearance:none;
+  transition:background .28s ease, border-color .28s ease, color .28s ease, transform .18s ease;
+}
+.placard.on .p-add{ pointer-events:auto; }
+.placard .p-add:hover{ background:var(--ink); color:#f4f0e8; border-color:var(--ink); }
+.placard .p-add:active{ transform:translateY(1px); }
+.placard .p-add.added{
+  background:var(--ink); color:#f4f0e8; border-color:var(--ink);
+  letter-spacing:.14em;
+}
+
+@media (max-aspect-ratio: 9/10){
+  .placard .p-add{ min-height:44px; font-size:clamp(11px, 3vw, 13px); }   /* thumb target */
+}

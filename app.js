@@ -15,14 +15,14 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 const COLLECTION = {
   title: 'Gorgon Collection',
   products: [
-    { id:'calabria', name:'Medusa Calabria Italy', date:'2nd–1st BCE', price:'$45',
+    { id:'calabria', cartId:6379, name:'Medusa Calabria Italy', date:'2nd–1st BCE', price:'$45',
       url:'https://clayandkelsy.com/medusa-calabria-italy/', file:'assets/calabria.glb' },
-    { id:'baroque',  name:'Medusa Baroque Europe', date:'17th Century', price:'$45',
+    { id:'baroque', cartId:6385,  name:'Medusa Baroque Europe', date:'17th Century', price:'$45',
       url:'https://clayandkelsy.com/medusa-baroque-europe/', file:'assets/baroque.glb' },
-    { id:'winged',   name:'Winged Medusa Egypt',   date:'332–250 BCE', price:'$42',
+    { id:'winged', cartId:6393,   name:'Winged Medusa Egypt',   date:'332–250 BCE', price:'$42',
       url:'https://clayandkelsy.com/medusa-winged-egypt/', file:'assets/winged.glb',
       hoverScale: 1.17 },   // wide plaque, small face — meets the others at full hover
-    { id:'southern', name:'Medusa Southern Italy', date:'500 BCE', price:'$42',
+    { id:'southern', cartId:6371, name:'Medusa Southern Italy', date:'500 BCE', price:'$42',
       url:'https://clayandkelsy.com/medusa-southern-italy/', file:'assets/southern.glb' },
   ],
   /* the light "gallery wall" behind everything — retune per collection */
@@ -287,8 +287,32 @@ Promise.all(COLLECTION.products.map((p) => new Promise((res, rej) =>
       `<span class="lnk"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2">` +
       `<path d="M1.5 8.5 8.5 1.5 M3 1.5 H8.5 V7"/></svg></span></div>` +
       `<span class="dt">${prod.date}` +
-      (prod.price ? `<span class="pr">${prod.price}</span>` : '') + `</span>`;
+      (prod.price ? `<span class="pr">${prod.price}</span>` : '') + `</span>` +
+      (prod.cartId ? `<button class="p-add mono" type="button" aria-label="Add ${prod.name} to cart">[ add to cart ]</button>` : '');
     label.addEventListener('click', () => navigate(i));
+
+    /* the Add control is a SEPARATE action — it must never open the product
+       page, and the actual cart add happens on clayandkelsy.com (the cart is
+       cross-origin to this gallery iframe), so we post the piece up to the
+       parent, which does the first-party AJAX add + the mini-cart drawer. */
+    const addBtn = label.querySelector('.p-add');
+    if (addBtn) {
+      addBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (window.parent !== window) {
+          try { parent.postMessage({ ckd: 'addcart', id: prod.cartId,
+                                     name: prod.name, price: prod.price }, '*'); } catch (_) {}
+        }
+        addBtn.classList.add('added');
+        addBtn.textContent = '[ added ✓ ]';
+        clearTimeout(addBtn._t);
+        addBtn._t = setTimeout(() => {
+          addBtn.classList.remove('added');
+          addBtn.textContent = '[ add to cart ]';
+        }, 2400);
+      });
+    }
     // gliding from the piece down onto its placard keeps it presented + clickable
     label.addEventListener('pointerenter', () => { labelHold = i; });
     label.addEventListener('pointerleave', () => { if (labelHold === i) labelHold = -1; });

@@ -16,13 +16,13 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 const COLLECTION = {
   title: 'The Odyssey',
   products: [
-    { id:'odysseus', name:'Odysseus, King of Ithaca', date:'Homer’s Odyssey', price:'$42',
+    { id:'odysseus', cartId:6417, name:'Odysseus, King of Ithaca', date:'Homer’s Odyssey', price:'$42',
       url:'https://clayandkelsy.com/odysseus-king-of-ithaca/', file:'../assets/odysseus.glb' },
-    { id:'athena',   name:'Athena / Minerva',         date:'1st–2nd century AD', price:'$38',
+    { id:'athena', cartId:6336,   name:'Athena / Minerva',         date:'1st–2nd century AD', price:'$38',
       url:'https://clayandkelsy.com/athena-minerva/', file:'../assets/athena.glb' },
-    { id:'cyclops',  name:'Polyphemus, The Cyclops',  date:'2nd century', price:'$42',
+    { id:'cyclops', cartId:6397,  name:'Polyphemus, The Cyclops',  date:'2nd century', price:'$42',
       url:'https://clayandkelsy.com/polyphemus-the-cyclops/', file:'../assets/cyclops.glb' },
-    { id:'shepherd', name:'Polyphemus, The Shepherd', date:'2nd century', price:'$38',
+    { id:'shepherd', cartId:6399, name:'Polyphemus, The Shepherd', date:'2nd century', price:'$38',
       url:'https://clayandkelsy.com/polyphemus-the-shepherd/', file:'../assets/shepherd.glb' },
   ],
   /* cave wall: cool stone grays (the Gorgon room is warm paper — this one is
@@ -292,8 +292,32 @@ Promise.all(COLLECTION.products.map((p) => new Promise((res, rej) =>
       `<span class="lnk"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2">` +
       `<path d="M1.5 8.5 8.5 1.5 M3 1.5 H8.5 V7"/></svg></span></div>` +
       `<span class="dt">${prod.date}` +
-      (prod.price ? `<span class="pr">${prod.price}</span>` : '') + `</span>`;
+      (prod.price ? `<span class="pr">${prod.price}</span>` : '') + `</span>` +
+      (prod.cartId ? `<button class="p-add mono" type="button" aria-label="Add ${prod.name} to cart">[ add to cart ]</button>` : '');
     label.addEventListener('click', () => navigate(i));
+
+    /* the Add control is a SEPARATE action — it must never open the product
+       page, and the actual cart add happens on clayandkelsy.com (the cart is
+       cross-origin to this gallery iframe), so we post the piece up to the
+       parent, which does the first-party AJAX add + the mini-cart drawer. */
+    const addBtn = label.querySelector('.p-add');
+    if (addBtn) {
+      addBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (window.parent !== window) {
+          try { parent.postMessage({ ckd: 'addcart', id: prod.cartId,
+                                     name: prod.name, price: prod.price }, '*'); } catch (_) {}
+        }
+        addBtn.classList.add('added');
+        addBtn.textContent = '[ added ✓ ]';
+        clearTimeout(addBtn._t);
+        addBtn._t = setTimeout(() => {
+          addBtn.classList.remove('added');
+          addBtn.textContent = '[ add to cart ]';
+        }, 2400);
+      });
+    }
     // gliding from the piece down onto its placard keeps it presented + clickable
     label.addEventListener('pointerenter', () => { labelHold = i; });
     label.addEventListener('pointerleave', () => { if (labelHold === i) labelHold = -1; });

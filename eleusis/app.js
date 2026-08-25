@@ -18,11 +18,11 @@ const COLLECTION = {
   /* a PERFECT ROW of three, left → right: Grain · Poppy · Sacred Vessel —
      the symbols left behind. Masthead sits top-LEFT (like the Gorgons). */
   products: [
-    { id:'grain',  name:'Wheat Sheaf',   date:'1st c. BCE', price:'$27', flip:true,
+    { id:'grain', cartId:6410,  name:'Wheat Sheaf',   date:'1st c. BCE', price:'$27', flip:true,
       url:'https://clayandkelsy.com/eleusis-grain/', file:'../assets/grain.glb' },
-    { id:'poppy',  name:'Poppy',         date:'1st c. BCE', price:'$27', flip:true,
+    { id:'poppy', cartId:6413,  name:'Poppy',         date:'1st c. BCE', price:'$27', flip:true,
       url:'https://clayandkelsy.com/eleusis-poppy/', file:'../assets/poppy.glb' },
-    { id:'vessel', name:'Sacred Vessel', date:'1st c. BCE', price:'$27', flip:true,
+    { id:'vessel', cartId:6415, name:'Sacred Vessel', date:'1st c. BCE', price:'$27', flip:true,
       url:'https://clayandkelsy.com/eleusis-sacred-vessel/', file:'../assets/vessel.glb' },
   ],
   /* a VERY SLIGHT pink wall — sacred, initiatory, softer than the other two
@@ -292,8 +292,32 @@ Promise.all(COLLECTION.products.map((p) => new Promise((res, rej) =>
       `<span class="lnk"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2">` +
       `<path d="M1.5 8.5 8.5 1.5 M3 1.5 H8.5 V7"/></svg></span></div>` +
       `<span class="dt">${prod.date}` +
-      (prod.price ? `<span class="pr">${prod.price}</span>` : '') + `</span>`;
+      (prod.price ? `<span class="pr">${prod.price}</span>` : '') + `</span>` +
+      (prod.cartId ? `<button class="p-add mono" type="button" aria-label="Add ${prod.name} to cart">[ add to cart ]</button>` : '');
     label.addEventListener('click', () => navigate(i));
+
+    /* the Add control is a SEPARATE action — it must never open the product
+       page, and the actual cart add happens on clayandkelsy.com (the cart is
+       cross-origin to this gallery iframe), so we post the piece up to the
+       parent, which does the first-party AJAX add + the mini-cart drawer. */
+    const addBtn = label.querySelector('.p-add');
+    if (addBtn) {
+      addBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (window.parent !== window) {
+          try { parent.postMessage({ ckd: 'addcart', id: prod.cartId,
+                                     name: prod.name, price: prod.price }, '*'); } catch (_) {}
+        }
+        addBtn.classList.add('added');
+        addBtn.textContent = '[ added ✓ ]';
+        clearTimeout(addBtn._t);
+        addBtn._t = setTimeout(() => {
+          addBtn.classList.remove('added');
+          addBtn.textContent = '[ add to cart ]';
+        }, 2400);
+      });
+    }
     // gliding from the piece down onto its placard keeps it presented + clickable
     label.addEventListener('pointerenter', () => { labelHold = i; });
     label.addEventListener('pointerleave', () => { if (labelHold === i) labelHold = -1; });
