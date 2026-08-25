@@ -85,6 +85,11 @@ if (window.parent !== window) {
   const ckProbe = () => { try { parent.postMessage({ ckd: 'cartprobe' }, '*'); } catch (_) {} };
   ckProbe(); setTimeout(ckProbe, 700); setTimeout(ckProbe, 2000);
 }
+/* PREVIEW ONLY: open any room with ?preview=cart to see the Add buttons without
+   the live bridge (for reviewing the look). Harmless — nothing is really added,
+   and normal visitors never carry this param, so the live page is unaffected. */
+if (new URLSearchParams(location.search).get('preview') === 'cart')
+  document.body.classList.add('cart-ready');
 const flash = document.getElementById('flash');
 
 /* ============================= RENDERER ============================= */
