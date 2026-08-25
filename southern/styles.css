@@ -561,3 +561,17 @@ body{ min-height:100%; position:relative; }
   .buy{ margin-top:.9em; }
   .value + .buy{ margin-top:.85em; }
 }
+
+/* ══ renter-friendly benefit line — a scannable feature note high in the hero,
+   distinct from the story prose. Restrained: ink key phrase, one pink pop. ══ */
+.benefit{
+  margin-top:1.05em;
+  font-family:'Courier Prime', ui-monospace, monospace;
+  font-size:clamp(11px,1.35vmin,13px);
+  letter-spacing:.03em;
+  line-height:1.55;
+  color:var(--muted);
+  max-width:40ch;
+}
+.benefit .b-key{ color:var(--ink); font-weight:700; letter-spacing:.06em; }
+.benefit b{ color:var(--ink); font-weight:700; }
