@@ -109,6 +109,13 @@ body{ min-height:100%; overflow-x:hidden; }
 }
 #masthead .t-step b{ font-weight:700; color:var(--ink); }
 #masthead .t-step i{ font-style:normal; color:var(--pink); }
+#masthead .t-fine{
+  margin-top:.55em;
+  font-size:clamp(9.5px, 1.15vmin, 11px);
+  letter-spacing:.08em;
+  color:var(--muted);
+  opacity:.72;
+}
 
 #hint{
   position:absolute; left:clamp(22px, 4.2vw, 56px); bottom:clamp(18px, 3.4vh, 34px);
