@@ -78,6 +78,18 @@ const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const stage = document.getElementById('stage');
 const canvas = document.getElementById('gl');
 const labelLayer = document.getElementById('labelLayer');
+
+/* The placard Add buttons stay hidden until the parent page confirms the cart
+   bridge (the companion WP script) is installed — so a missing/removed script
+   never shows a button that can't actually add. Gate via <body class="cart-ready">. */
+if (window.parent !== window) {
+  addEventListener('message', (e) => {
+    if (e.data && e.data.ckd === 'cartready' && e.origin.indexOf('clayandkelsy.com') !== -1)
+      document.body.classList.add('cart-ready');
+  });
+  const ckProbe = () => { try { parent.postMessage({ ckd: 'cartprobe' }, '*'); } catch (_) {} };
+  ckProbe(); setTimeout(ckProbe, 700); setTimeout(ckProbe, 2000);
+}
 const flash = document.getElementById('flash');
 
 /* ============================= RENDERER ============================= */

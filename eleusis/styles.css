@@ -265,3 +265,8 @@ body{ min-height:100%; overflow-x:hidden; }
 @media (max-aspect-ratio: 9/10){
   .placard .p-add{ min-height:44px; font-size:clamp(11px, 3vw, 13px); }   /* thumb target */
 }
+
+/* the Add pill appears only once the /designs/ cart bridge confirms itself —
+   see the handshake in app.js + the companion WordPress script */
+.placard .p-add{ display:none; }
+body.cart-ready .placard .p-add{ display:flex; }
