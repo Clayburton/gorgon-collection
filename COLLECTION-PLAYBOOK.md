@@ -403,3 +403,24 @@ WP product page via its own `wordpress-embed.html`. Clone `baroque/` and swap:
   black-figure… see git history of v0.1 for the six-finish shader).
 - Packaging typeface match (packaging file wasn't in the folder yet — drop it
   in and compare against Cormorant Garamond).
+
+### Product pages — lazy 3D on mobile (2026-08-07)
+
+The WebGL hero is ~885KB (three.js 439 + model 446) — ~73% of the page. On
+mobile that is dead weight and it pushes the price/Add-to-cart below the fold.
+So `app.js` splits into two layers:
+
+- **Top level (no three.js):** the static hero photo (`PHOTOS[0]` in `#pieceSlot`),
+  price/cart wiring, size line, complete-the-collection strip, gallery rail, and
+  the iframe height-posting/scroll-lock. Runs the instant the HTML lands.
+- **`async function boot3D()`:** dynamic-imports three.js + the addons and builds
+  the whole WebGL scene. `if (!IS_MOBILE) boot3D()` on desktop; on mobile a
+  `view in 3D` button loads it on tap (and the gallery wall is painted in CSS
+  from `P.backdrop` since there is no canvas to render it).
+
+`IS_MOBILE = matchMedia('(max-width: 700px)')` — **width only**; do NOT add
+`(pointer: coarse)` (it matches touch-laptops and the emulator, breaking desktop).
+The engine below `const REDUCE` is byte-identical across all 11 (alt text from the
+`.title`, `if (PIECE.flip)` universal/harmless). Mobile CSS also shrinks
+`#pieceSlot` so the buy cluster lands on the first screen (value still above price).
+Measured live: mobile initial weight 1207KB → **324KB**, cart 875px → **690px**.
