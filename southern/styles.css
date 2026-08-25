@@ -503,3 +503,18 @@ body{ min-height:100%; position:relative; }
 .dims[hidden]{ display:none !important; }   /* author display beats [hidden] */
 .dims .d-mm{ color:var(--ink); font-weight:700; }
 .dims .d-in{ color:var(--muted); letter-spacing:.1em; }
+
+/* ── value line — leads the buy row with the object's craft + how it mounts,
+   so a shopper meets the value before the price (myth story sits above it) ── */
+.value{
+  margin-top:1.35em;
+  font-family:'EB Garamond', Georgia, serif;
+  font-weight:500;
+  font-size:clamp(14.5px,1.85vmin,17px);
+  line-height:1.55;
+  color:var(--ink);
+  opacity:.9;
+  max-width:42ch;
+}
+.value strong{ font-weight:600; opacity:1; }
+.value + .buy{ margin-top:1.15em; }
