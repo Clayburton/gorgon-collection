@@ -44,7 +44,7 @@ const COLLECTION = {
   },
   /* landscape scatter (fractions of visible half-plane) + sizes */
   scatterL: [
-    { x:-0.42, y:-0.34, z: 0.05, s:0.92 },   // calabria: right+down, clear of the offer text column
+    { x:-0.56, y:-0.30, z: 0.05, s:0.92, xN:-0.42, yN:-0.34 },   // calabria: original left spot (clears the baroque mask); xN/yN shift it right only on narrow windows, where the offer text would otherwise land on it
     { x:-0.06, y: 0.14, z:-0.20, s:1.02 },
     { x: 0.52, y: 0.33, z:-0.30, s:0.95 },   // winged: down+right, out from under the masthead (Clay's note)
     { x: 0.62, y:-0.30, z: 0.15, s:0.95 },
@@ -437,7 +437,13 @@ function layout() {
     } else {
       const sl = COLLECTION.scatterL[i % COLLECTION.scatterL.length];
       const yTop = halfH * (1 - P.topClear * 2);      // menu-bar headroom
-      r.home.set(sl.x * halfW * P.spreadX, Math.min(sl.y * halfH * P.spreadY, yTop), sl.z);
+      // some pieces carry a narrow-window override (xN/yN): on laptop-width
+      // viewports the tall masthead's offer text sits lower, so those pieces
+      // shift clear of it; wide screens keep the roomier original placement
+      const narrow = w < 1200;
+      const sx = (narrow && sl.xN !== undefined) ? sl.xN : sl.x;
+      const sy = (narrow && sl.yN !== undefined) ? sl.yN : sl.y;
+      r.home.set(sx * halfW * P.spreadX, Math.min(sy * halfH * P.spreadY, yTop), sl.z);
       r.sBase = sl.s * P.objScale * Math.min(halfW, halfH);
     }
     r.pos.copy(r.home);
