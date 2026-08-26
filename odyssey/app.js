@@ -52,7 +52,7 @@ const COLLECTION = {
     { x:-0.04, y:-0.02, z:-0.16, s:1.22 },   // Odysseus — the hero, center stage, featured
     { x:-0.52, y: 0.52, z:-0.28, s:1.30 },   // Athena — the goddess, featured, watching from above
     { x:-0.68, y:-0.52, z: 0.05, s:0.96 },   // Cyclops — bottom-left of the pair
-    { x: 0.54, y:-0.52, z: 0.05, s:0.96 },   // Shepherd — bottom-right, mirrors the Cyclops
+    { x: 0.48, y:-0.60, z: 0.05, s:0.96 },   // Shepherd — bottom-right, nudged down to clear the offer's last line
   ],
 };
 

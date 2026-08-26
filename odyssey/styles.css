@@ -72,13 +72,57 @@ body{ min-height:100%; overflow-x:hidden; }
   opacity:.88;
   max-width:38ch;
 }
-#masthead .note{
+#masthead .feats{
   margin-top:1.4em;
-  font-size:clamp(10.5px, 1.3vmin, 12.5px);
-  letter-spacing:.18em;
-  text-transform:uppercase;
+  padding-top:1.15em;
+  border-top:1px solid var(--hair);
+  display:flex; flex-direction:column; gap:.5em;
+  max-width:40ch;
+}
+#masthead .feat{
+  font-family:'EB Garamond', Georgia, serif;
+  font-size:clamp(13px, 1.72vmin, 15.5px);
+  line-height:1.4;
+  color:var(--ink);
+  opacity:.8;
+}
+#masthead .feat b{ font-weight:600; opacity:1; }        /* the lead word carries the eye */
+
+/* ── collection offer ──────────────────
+   The sentence in the serif voice; the steps as quiet mono. Only the
+   percentages are allowed to carry colour. */
+#masthead .offer{ margin-top:1.35em; max-width:34ch; }
+#masthead .offer .lead{
+  font-family:'EB Garamond', Georgia, serif;
+  font-style:italic;
+  font-size:clamp(14px, 1.9vmin, 16.5px);
+  line-height:1.5;
+  color:var(--ink);
+  opacity:.9;
+}
+#masthead .offer .lead em{ font-style:italic; font-weight:600; opacity:1; }
+#masthead .ladder{
+  margin-top:.6em;
+  display:flex; gap:1.5em;
+  font-family:'Courier Prime', ui-monospace, monospace;
+  font-size:clamp(10px, 1.22vmin, 11.5px);
+  letter-spacing:.06em;
+}
+#masthead .ladder span{ display:inline-flex; align-items:baseline; gap:.5em; white-space:nowrap; }
+#masthead .ladder b{ font-weight:700; color:var(--ink); }
+#masthead .ladder i{ font-style:normal; color:var(--pink); }
+#masthead .fine{
+  margin-top:.65em;
+  font-family:'EB Garamond', Georgia, serif;
+  font-style:italic;
+  font-size:clamp(11px, 1.4vmin, 13.5px);
   color:var(--muted);
 }
+/* right-anchored masthead: push the constrained-width feature/offer blocks to
+   the right edge and justify the discount ladder there too */
+#masthead .feats,
+#masthead .offer{ margin-left:auto; }
+#masthead .ladder{ justify-content:flex-end; }
 
 #hint{
   position:absolute; left:clamp(22px, 4.2vw, 56px); bottom:clamp(18px, 3.4vh, 34px);
@@ -231,8 +275,6 @@ body{ min-height:100%; overflow-x:hidden; }
   #flash{ transition:opacity .1s linear; }
 }
 
-/* shipping, stated high up so nobody has to hunt for it */
-#masthead .note.ship{ margin-top:.5em; }
 
 /* ══ placard Add-to-cart — a slim outlined pill, understated gallery feel.
    Reveals WITH the placard on desktop hover (same moment the price appears);

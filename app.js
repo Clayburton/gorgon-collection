@@ -44,9 +44,9 @@ const COLLECTION = {
   },
   /* landscape scatter (fractions of visible half-plane) + sizes */
   scatterL: [
-    { x:-0.56, y:-0.30, z: 0.05, s:0.92 },
+    { x:-0.42, y:-0.34, z: 0.05, s:0.92 },   // calabria: right+down, clear of the offer text column
     { x:-0.06, y: 0.14, z:-0.20, s:1.02 },
-    { x: 0.42, y: 0.42, z:-0.30, s:0.95 },
+    { x: 0.52, y: 0.33, z:-0.30, s:0.95 },   // winged: down+right, out from under the masthead (Clay's note)
     { x: 0.62, y:-0.30, z: 0.15, s:0.95 },
   ],
 };
